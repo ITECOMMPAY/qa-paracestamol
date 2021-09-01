@@ -1,0 +1,27 @@
+# suite config
+namespace: ParacetamolTests
+
+suites:
+    acceptance:
+        actor: AcceptanceTester
+        path: .
+        modules:
+                
+extensions:
+
+params: 
+    - env
+
+gherkin: []    
+
+# additional paths
+paths:
+    tests: cases
+    output: cases/_output
+    data: cases/_data
+    support: cases/_support
+    envs: cases/_envs
+
+settings:
+    shuffle: false
+    lint: true

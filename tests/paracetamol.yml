@@ -1,0 +1,33 @@
+project_name: ParacetamolTests
+groups: []
+env: []
+rerun_count: 2
+delay_msec: -1
+max_rps: 50
+idle_timeout_sec: 30
+stat_endpoint: "http://localhost:3000"
+show_first_fail: true
+
+not_dividable_rerun_whole:
+    - NotDividableCest.php
+
+not_dividable_rerun_failed:
+    - NotDividableUntilRerunCest.php
+    - NotDividableUntilRerunFlickingCest.php
+
+skip_tests:
+    - SomeCest.php:test02
+
+run_before_series:
+    - SomeBeforeAfterCest.php:before02
+    - SomeBeforeAfterCest.php:before01
+
+run_before_parallel:
+    - SomeParallelBeforeCest.php
+
+run_after_parallel:
+    - parallelAfter
+
+run_after_series:
+    - SomeBeforeAfterCest.php:after01
+    - SomeBeforeAfterCest.php:after02

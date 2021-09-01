@@ -1,0 +1,7 @@
+.idea
+vendor
+composer.phar
+logs
+_output
+_generated
+Temp*Cest.php
