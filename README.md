@@ -1,6 +1,6 @@
 Parallel runner for Codeception tests
 
-#Installation
+# Installation
 
 This utility requires PHP 7.4 with json, mbstring and php-ds extensions.
 
@@ -21,7 +21,7 @@ Add the repository and component to the composer.json of your Codeception tests 
 ```
 Expect frequent API changes until the first numbered release.
 
-#Usage
+# Usage
 
 From inside your project directory:
 
@@ -31,7 +31,7 @@ php ./vendor/bin/paracetamol run suite_name path_to_codeception_yml number_of_pr
 
 By default the utility displays progress bars. To get a more verbose output pass to it -v, -vv or -vvv argument.
 
-##Options
+## Options
 
 If a file with the name `paracetamol.yml` is placed in the same directory as your `codeception.yml` then the following options will be read from it.
 The options that are passed as command-line arguments will override the options that are defined in the `paracetamol.yml` file.
