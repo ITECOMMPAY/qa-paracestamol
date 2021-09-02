@@ -1,15 +1,23 @@
 Parallel runner for Codeception tests
 
+# Demo
+
+To quickly see Paracetamol in action just: 
+
+1. Clone the repo
+2. Do `composer install`
+3. Execute `php ./paracetamol run acceptance ./tests/ 4`
+
 # Installation
 
-This utility requires PHP 7.4 with json, mbstring and php-ds extensions.
+This utility is written for Unix-like OS and requires PHP 7.4 with json, mbstring and php-ds extensions.
 
-Add the repository and component to the composer.json of your Codeception tests project
+Add the repository and the component to the composer.json of your Codeception tests project
 
 ```
 {
     "require": {
-        "itecommpay/qa-paracetamol": "dev-master"
+        "itecommpay/qa-paracetamol": "dev-main"
     },
     "repositories": [
         {
