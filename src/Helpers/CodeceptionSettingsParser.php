@@ -29,7 +29,7 @@ trait CodeceptionSettingsParser
         $this->getSettings()->setCodeceptionBinPath($codeceptionBinary);
     }
 
-    protected function loadCodeceptionConfig(InputInterface $input) : void
+    protected function resolveCodeceptionConfigPath(InputInterface $input) : void
     {
         $configPath = $this->findConfigPath($input);
 
@@ -40,13 +40,16 @@ trait CodeceptionSettingsParser
 
         $this->getSettings()->setCodeceptionConfigPath($configPath);
 
+        $this->setTestProjectPath();
+    }
+
+    protected function loadCodeceptionConfig(InputInterface $input) : void
+    {
         $parsedConfig = Yaml::parseFile($this->getSettings()->getCodeceptionConfigPath());
 
         $this->getSettings()->setCodeceptionConfig($parsedConfig);
 
         $this->setNamespace();
-
-        $this->setTestProjectPath();
 
         $this->overrideCodeceptionConfigFromOptions($input);
 
@@ -115,6 +118,8 @@ trait CodeceptionSettingsParser
             return;
         }
 
+        sort($envOptions, SORT_NATURAL);
+
         $envNames = [];
 
         foreach ($envOptions as $envOption)
@@ -123,8 +128,6 @@ trait CodeceptionSettingsParser
         }
 
         $envNames = array_merge(...$envNames);
-
-        sort($envNames, SORT_NATURAL);
 
         $this->getSettings()->setEnv($envNames);
 

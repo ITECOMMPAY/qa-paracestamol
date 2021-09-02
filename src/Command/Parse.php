@@ -69,6 +69,8 @@ class Parse extends Command
             $this->saveArgument($input, 'result_file');
 
             $this->resolveCodeceptionBinPath();
+            $this->resolveCodeceptionConfigPath($input);
+
             $this->loadCodeceptionConfig($input);
 
             $this->overrideSettings($input, 'cache_tests');

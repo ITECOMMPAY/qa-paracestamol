@@ -95,9 +95,11 @@ class Run extends Command
             $this->saveArgument($input, 'process_count');
 
             $this->resolveCodeceptionBinPath();
-            $this->loadCodeceptionConfig($input);
+            $this->resolveCodeceptionConfigPath($input);
 
             $this->loadParacetamolSettings($input);
+            $this->loadCodeceptionConfig($input);
+
             $this->overrideSettings($input, 'project_name');
             $this->overrideSettings($input, 'rerun_count');
             $this->overrideSettings($input, 'groups');

@@ -71,8 +71,8 @@ Option | Example | Description
 rerun_count, r | -r 3 | How many times to rerun failed tests
 groups, g | -g cat -g dog | Run only tests marked with the given groups
 delay_msec, d | -d 25 | If several tests try to start at the same time then wait the given delay between these starts. 0 — cancels delay. -1 — automatically calculate the delay using the max_rps option 
-max_rps | --max_rps 50 | Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/max_rps
-env | --env shuffle,no_lint <br />OR<br /> --env shuffle --env no_lint | Run tests in the selected environment. Note that all env arguments are treated as one environment, the same way if it was merged with ','. Also note that the order in which the environment files are given is NOT preserved
+max_rps | --max_rps 50 | Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/min(max_rps, number_of_processes)
+env | --env shuffle,no_lint <br />(will preserve the given order) <br /><br /> --env shuffle --env no_lint <br />(will sort the envs naturally)| Run tests in the selected environment. Note that all env arguments are treated as one environment, the same way if it was merged with ','. Also note that the order in which the environment files are given is NOT preserved when they are given using separate arguments.
 override, o | -o "settings: shuffle: true" | Overrides codeception config values
 run_output_path | --run_output_path /home/egor/output | Overrides the tests output directory
 idle_timeout_sec, t | -t 600 | Terminate a test if it takes more than the given time to run
@@ -82,7 +82,7 @@ show_first_fail | --show_first_fail true | Show the output of the first failed t
 cache_tests | --cache_tests true | Parsing a bunch of big tests can take a long time. Paracetamol can cache a parsing results and use them in the further runs. The caching takes some time too and is not recommended if you don't experience the problem with long parsing times
 store_cache_in | --store_cache_in /home/egor | Where to store the parsing cache
 project_name | --project_name ParacetamolTests | Used for test duration statistics. By default your test suite namespace is used as your test project name. You can override it using this option
-parac_config | --parac_config /home/egor/testproject/tests (looks for paracetamol.yml in the directory)<br /><br /> --parac_config /home/egor/testproject/tests/paracetamol_fast.yml <br />OR<br /> --parac_config paracetamol_fast.yml (if your paracetamol config stored in the same directory as your codeception.yml but have a non-default name) | If your paracetamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option
+parac_config | --parac_config /home/egor/testproject/tests <br />(looks for paracetamol.yml in the directory)<br /><br /> --parac_config /home/egor/testproject/tests/paracetamol_fast.yml <br />OR<br /> --parac_config paracetamol_fast.yml <br />(if your paracetamol config stored in the same directory as your codeception.yml but have a non-default name) | If your paracetamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option
 only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)
 skip_tests | --skip_tests SomeCest.php:test02 | Skip these tests
 skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests
