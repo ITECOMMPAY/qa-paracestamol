@@ -406,7 +406,9 @@ HEREDOC
         }
 
         $trimLongLines = function (string $value) {
-            return implode(PHP_EOL, array_map(function ($v) {return mb_strlen($v) > 96 ? (mb_substr($v, 0, 92) . ' ...') : $v;}, explode(PHP_EOL, $value)));
+            $lines = explode(PHP_EOL, $value);
+            $firstLine = empty($lines) ? '' : reset($lines);
+            return mb_strlen($firstLine) > 96 ? (mb_substr($firstLine, 0, 92) . ' ...') : $firstLine;
         };
 
         $logLines = [];
