@@ -56,7 +56,7 @@ class RunnersSupervisor
         }
 
         $this->runnersTouched = 0;
-        usleep(4000); // max 250 RPS, but CPU usage should go down
+        usleep(10000); // max 100 RPS, but CPU usage should go down
     }
 
     public function run()
