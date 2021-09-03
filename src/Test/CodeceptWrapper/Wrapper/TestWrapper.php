@@ -33,7 +33,7 @@ class TestWrapper extends AbstractCodeceptWrapper
             $runOptions []= $this->settings->getOverrideAsString();
         }
 
-        return ['php', $codeceptionBin, 'run', $suite, $this->testName, ...$runOptions];
+        return ['php', $codeceptionBin, 'run', $suite, "{$this->testName}$", ...$runOptions];
     }
 
     public function isSuccessful() : bool
