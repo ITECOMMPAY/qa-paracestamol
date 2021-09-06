@@ -6,6 +6,7 @@ use Codeception\Configuration;
 use Codeception\Util\PathResolver;
 use Paracetamol\Exceptions\InvalidArgumentException;
 use Paracetamol\Exceptions\UsageException;
+use Paracetamol\Log\Log;
 use Paracetamol\Settings\ICodeceptionHelperSettings;
 use SplFileInfo;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +16,8 @@ use Symfony\Component\Yaml\Yaml;
 
 trait CodeceptionSettingsParser
 {
+    abstract protected function getLog() : Log;
+
     abstract protected function getSettings() : ICodeceptionHelperSettings;
 
     protected function resolveCodeceptionBinPath() : void
@@ -65,6 +68,9 @@ trait CodeceptionSettingsParser
     protected function setTestProjectPath() : void
     {
         $projectDir = realpath(dirname($this->getSettings()->getCodeceptionConfigPath()));
+
+        $this->getLog()->debug('Project dir is: ' . $projectDir);
+
         $this->getSettings()->setTestProjectPath($projectDir);
     }
 
@@ -77,7 +83,11 @@ trait CodeceptionSettingsParser
             $testsSubdir = $this->getSettings()->getSuite();
         }
 
-        $this->getSettings()->setTestsPath(realpath($this->getSettings()->getTestProjectPath() . DIRECTORY_SEPARATOR . $testsSubdir));
+        $testsDir = realpath($this->getSettings()->getTestProjectPath() . DIRECTORY_SEPARATOR . $testsSubdir);
+
+        $this->getLog()->debug('Tests dir is: ' . $testsDir);
+
+        $this->getSettings()->setTestsPath($testsDir);
     }
 
     protected function setSupportPath() : void
@@ -88,6 +98,8 @@ trait CodeceptionSettingsParser
         {
             $supportSubdir = realpath($this->getSettings()->getTestProjectPath() . DIRECTORY_SEPARATOR . $supportSubdir);
         }
+
+        $this->getLog()->debug('Support dir is: ' . $supportSubdir);
 
         $this->getSettings()->setSupportPath($supportSubdir);
     }
@@ -100,6 +112,8 @@ trait CodeceptionSettingsParser
         {
             $outputSubdir = realpath($this->getSettings()->getTestProjectPath() . DIRECTORY_SEPARATOR . $outputSubdir);
         }
+
+        $this->getLog()->debug('Output dir is: ' . $outputSubdir);
 
         $this->getSettings()->setOutputPath($outputSubdir);
     }
@@ -265,14 +279,20 @@ trait CodeceptionSettingsParser
 
     protected function findConfigPath(InputInterface $input) : ?string
     {
+        $this->getLog()->debug('Searching for codeception.yml');
+
         $config = $input->getArgument('config') . DIRECTORY_SEPARATOR . 'codeception.yml';
 
         if (!file_exists($config))
         {
+            $this->getLog()->debug($config . ' - is not exist. Looking in another dir.');
+
             $config = getcwd() . DIRECTORY_SEPARATOR . $config;
 
             if (!file_exists($config))
             {
+                $this->getLog()->debug($config . ' - is not exist. codeception.yml is not found');
+
                 return null;
             }
         }
@@ -281,14 +301,20 @@ trait CodeceptionSettingsParser
 
         if ($config === false)
         {
+            $this->getLog()->debug('Can\'t get realpath of codeception.yml');
+
             return null;
         }
+
+        $this->getLog()->debug('codeception.yml is found: ' . $config);
 
         return $config;
     }
 
     protected function findCodeceptionBinPath() : ?string
     {
+        $this->getLog()->debug('Searching for Codeception bin');
+
         $vendorDir = $this->findVendorPath(__DIR__, 10);
 
         if ($vendorDir === null)
@@ -296,26 +322,35 @@ trait CodeceptionSettingsParser
             return null;
         }
 
-        $codeceptionBinary = implode(DIRECTORY_SEPARATOR, [$vendorDir, 'vendor', 'bin', 'codecept']);
+        $codeceptionBinary = implode(DIRECTORY_SEPARATOR, [$vendorDir, 'bin', 'codecept']);
 
         if (!file_exists($codeceptionBinary))
         {
+            $this->getLog()->debug('Codeception bin is not found');
             return null;
         }
+
+        $this->getLog()->debug('Codeception bin is: ' . $codeceptionBinary);
 
         return $codeceptionBinary;
     }
 
     protected function findVendorPath(string $dir, int $tries) : ?string
     {
+        $this->getLog()->debug('Searching for vendor dir');
+
         if ($tries <=0 || $dir === '/' || !is_dir($dir))
         {
+            $this->getLog()->debug('Vendor dir is not found');
             return null;
         }
 
-        if (file_exists($dir . DIRECTORY_SEPARATOR . 'vendor'))
+        $result = $dir . DIRECTORY_SEPARATOR . 'vendor';
+
+        if (file_exists($result))
         {
-            return $dir;
+            $this->getLog()->debug('Vendor dir is: ' . $result);
+            return $result;
         }
 
         return $this->findVendorPath(dirname($dir), --$tries);

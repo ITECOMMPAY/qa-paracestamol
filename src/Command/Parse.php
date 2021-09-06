@@ -89,6 +89,11 @@ class Parse extends Command
         return 0;
     }
 
+    protected function getLog() : Log
+    {
+        return $this->log;
+    }
+
     protected function getSettings() : SettingsParse
     {
         return $this->settings;
