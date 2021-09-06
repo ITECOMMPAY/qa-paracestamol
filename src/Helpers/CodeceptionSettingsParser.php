@@ -110,8 +110,16 @@ trait CodeceptionSettingsParser
 
         if (!PathResolver::isPathAbsolute($outputSubdir))
         {
-            $outputSubdir = realpath($this->getSettings()->getTestProjectPath() . DIRECTORY_SEPARATOR . $outputSubdir);
+            $outputSubdir = $this->getSettings()->getTestProjectPath() . DIRECTORY_SEPARATOR . $outputSubdir;
         }
+
+        // Some test projects doesn't have an output dir created
+        if (!is_dir($outputSubdir) && !mkdir($outputSubdir) && !is_dir($outputSubdir))
+        {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $outputSubdir));
+        }
+
+        $outputSubdir = realpath($outputSubdir);
 
         $this->getLog()->debug('Output dir is: ' . $outputSubdir);
 
