@@ -25,8 +25,8 @@ class RunnersSupervisorFactory
      * @param Queue[] $queues
      * @return RunnersSupervisor
      */
-    public function get(array $queues) : RunnersSupervisor
+    public function get(array $queues, bool $continuousRerun = false) : RunnersSupervisor
     {
-        return new RunnersSupervisor($this->log, $this->settings, $this->runnerFactory, $queues);
+        return new RunnersSupervisor($this->log, $this->settings, $this->runnerFactory, $queues, $continuousRerun);
     }
 }

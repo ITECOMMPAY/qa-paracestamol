@@ -6,28 +6,47 @@ namespace Paracetamol\Test;
 
 use Ds\Map;
 use Ds\Queue;
+use Paracetamol\Helpers\TestNameParts;
 use Paracetamol\Log\Log;
 use Paracetamol\Settings\SettingsRun;
 use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
 
 class RunnersSupervisor
 {
-    protected Log         $log;
-    protected SettingsRun $settings;
-    protected Queue       $runners;
+    protected Log           $log;
+    protected SettingsRun   $settings;
+    protected RunnerFactory $runnerFactory;
 
-    protected int         $runnersTouched = 0;
-    protected Queue       $failedTests;
-    protected Map         $passedTestsDurations;
+    protected Queue         $runners;
 
-    public function __construct(Log $log, SettingsRun $settings, RunnerFactory $runnerFactory, array $queues)
+    protected Queue         $failedTests;
+    protected Queue         $failedTestsNoRerun;
+    protected Queue         $timedOutTests;
+    protected Map           $passedTestsDurations;
+    protected Map           $failedTestsRerunCounts;
+
+    protected TestNameParts $skipRerunsForTestNames;
+
+    protected bool          $continuousRerun;
+
+    public function __construct(Log $log, SettingsRun $settings, RunnerFactory $runnerFactory, array $queues, bool $continuousRerun)
     {
         $this->log = $log;
         $this->settings = $settings;
+        $this->runnerFactory = $runnerFactory;
 
         $this->prepareRunners($runnerFactory, $queues);
-        $this->failedTests = new Queue();
-        $this->passedTestsDurations = new Map();
+
+        $this->failedTests          = new Queue();
+        $this->failedTestsNoRerun   = new Queue();
+        $this->timedOutTests        = new Queue();
+
+        $this->passedTestsDurations   = new Map();
+        $this->failedTestsRerunCounts = new Map();
+
+        $this->continuousRerun = $continuousRerun;
+
+        $this->skipRerunsForTestNames = new TestNameParts($this->settings->getSkipReruns());
     }
 
     /**
@@ -46,39 +65,48 @@ class RunnersSupervisor
         }
     }
 
-    protected function wait()
-    {
-        $this->runnersTouched += 1;
-
-        if ($this->runnersTouched < $this->runners->count())
-        {
-            return;
-        }
-
-        $this->runnersTouched = 0;
-        usleep(10000); // max 100 RPS, but CPU usage should go down
-    }
-
     public function run()
     {
         $this->log->verbose("Running tests");
 
         while (!$this->runners->isEmpty())
         {
-            /** @var Runner $runner */
-            $runner = $this->runners->pop();
+            $runnersCount = $this->runners->count();
 
-            if ($runner->ticking())
+            for ($i = 0; $i < $runnersCount; $i++)
             {
-                $this->runners->push($runner);
-            }
-            else
-            {
-                $this->saveRunnerData($runner);
+                $this->touchRunner();
             }
 
-            $this->outputFirstFailedTest($runner);
-            $this->wait();
+            usleep(10000); // max 100 RPS, but CPU usage should go down
+        }
+    }
+
+    protected function touchRunner() : void
+    {
+        /** @var Runner $runner */
+        $runner = $this->runners->pop();
+
+        $this->outputFirstFailedTest($runner);
+
+        if ($runner->ticking())
+        {
+            $this->runners->push($runner);
+            return;
+        }
+
+        $this->saveFinishedRunnerData($runner);
+
+        if (!$this->continuousRerun)
+        {
+            return;
+        }
+
+        $queue = $this->getTestsForRerun();
+
+        if (!$queue->isEmpty())
+        {
+            $this->runners->push($this->runnerFactory->get($queue)->setLabel('(RERUN)'));
         }
     }
 
@@ -107,12 +135,25 @@ class RunnersSupervisor
         $this->log->verbose($error);
     }
 
-    protected function saveRunnerData(Runner $runner) : void
+    protected function saveFinishedRunnerData(Runner $runner) : void
     {
         /** @var ICodeceptWrapper $test */
         foreach ($runner->getFailedTests() as $test)
         {
-            $this->failedTests->push($test);
+            if ($this->rerunIsForbidden($test))
+            {
+                $this->failedTestsNoRerun->push($test);
+            }
+            else
+            {
+                $this->failedTests->push($test);
+            }
+        }
+
+        /** @var ICodeceptWrapper $test */
+        foreach ($runner->getTimedOutTests() as $test)
+        {
+            $this->timedOutTests->push($test);
         }
 
         /**
@@ -125,12 +166,80 @@ class RunnersSupervisor
         }
     }
 
+    protected function rerunIsForbidden(ICodeceptWrapper $test) : bool
+    {
+        if ($this->skipRerunsForTestNames->isEmpty())
+        {
+            return false;
+        }
+
+        return $test->matches($this->skipRerunsForTestNames);
+    }
+
+    protected function getTestsForRerun() : Queue
+    {
+        $result = new Queue();
+
+        if ($this->failedTests->isEmpty())
+        {
+            return $result;
+        }
+
+        if ($this->settings->getRerunCount() === 0)
+        {
+            return $result;
+        }
+
+        foreach ($this->failedTests as $test)
+        {
+            if ($this->rerunCountIsExhausted($test))
+            {
+                $this->failedTestsNoRerun->push($test);
+                continue;
+            }
+
+            $result->push($test);
+        }
+
+        return $result;
+    }
+
+    protected function rerunCountIsExhausted(ICodeceptWrapper $test) : bool
+    {
+        if (!$this->failedTestsRerunCounts->hasKey($test))
+        {
+            $this->failedTestsRerunCounts->put($test, -1);
+        }
+
+        $rerunCount = $this->failedTestsRerunCounts->get($test);
+
+        $this->failedTestsRerunCounts->put($test, ++$rerunCount);
+
+        return $rerunCount === $this->settings->getRerunCount();
+    }
+
     /**
      * @return Queue - [ICodeceptWrapper]
      */
     public function getFailedTests() : Queue
     {
         return $this->failedTests;
+    }
+
+    /**
+     * @return Queue - [ICodeceptWrapper]
+     */
+    public function getFailedTestsNoRerun() : Queue
+    {
+        return $this->failedTestsNoRerun;
+    }
+
+    /**
+     * @return Queue - [ICodeceptWrapper]
+     */
+    public function getTimedOutTests() : Queue
+    {
+        return $this->timedOutTests;
     }
 
     /**

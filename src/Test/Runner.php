@@ -21,6 +21,8 @@ class Runner
 
     protected ?ICodeceptWrapper $currentTest = null;
 
+    protected string   $label = '';
+
 
     public function __construct(Log $log, Delayer $delayer, Queue $queue)
     {
@@ -60,7 +62,7 @@ class Runner
         {
             $this->passedTestsDuration->put((string) $this->currentTest, $this->currentTest->getActualDuration());
 
-            $this->log->verbose('[PASS] ' . $this->currentTest);
+            $this->log->verbose('[PASS] ' . $this->currentTest . " $this->label");
             $this->log->progressAdvance();
             $this->currentTest = null;
             return true;
@@ -70,12 +72,12 @@ class Runner
         {
             if ($this->currentTest->isTimedOut())
             {
-                $this->log->verbose('     [TIMEOUT] ' . $this->currentTest);
+                $this->log->verbose('     [TIMEOUT] ' . $this->currentTest . " $this->label");
                 $this->timedOutTests->push($this->currentTest);
             }
             else
             {
-                $this->log->verbose('     [FAIL] ' . $this->currentTest);
+                $this->log->verbose('     [FAIL] ' . $this->currentTest . " $this->label");
                 $this->failedTests->push($this->currentTest);
             }
 
@@ -84,6 +86,13 @@ class Runner
         }
 
         return true;
+    }
+
+    public function setLabel(string $label) : Runner
+    {
+        $this->label = $label;
+
+        return $this;
     }
 
     /**

@@ -62,7 +62,7 @@ class ParacetamolRun
 
         $failedTests = [];
 
-        $failedTests [] = $this->runInSeries($runBeforeInSeries, $runCount, 'Before');
+        $failedTests [] = $this->runInSeries(  'Before', $runBeforeInSeries,   $runCount);
 
         if ($this->settings->isSerialBeforeFailsRun() && !$failedTests[0]->isEmpty())
         {
@@ -70,15 +70,15 @@ class ParacetamolRun
             throw new SerialBeforeFailedException('Serial before is failed - stopping the script');
         }
 
-        $failedTests [] = $this->runInParallel($runBeforeInParallel, $runCount, 'Before');
-        $failedTests [] = $this->runInParallel($runMain, $runCount, 'Main');
-        $failedTests [] = $this->runInParallel($runAfterInParallel, $runCount, 'After');
-        $failedTests [] = $this->runInSeries($runAfterInSeries, $runCount, 'After');
+        $failedTests [] = $this->runInParallel('Before', $runBeforeInParallel, $runCount, $this->settings->isContinuousRerun());
+        $failedTests [] = $this->runInParallel('Main',   $runMain,             $runCount, $this->settings->isContinuousRerun());
+        $failedTests [] = $this->runInParallel('After',  $runAfterInParallel,  $runCount, $this->settings->isContinuousRerun());
+        $failedTests [] = $this->runInSeries(  'After',  $runAfterInSeries,    $runCount);
 
         $this->prepareSimpleFailReport($failedTests);
     }
 
-    protected function runInParallel(Queue $tests, int $runCount, string $runName = '') : Queue
+    protected function runInParallel(string $runName, Queue $tests, int $runCount, bool $continuousRerun) : Queue
     {
         if ($tests->isEmpty())
         {
@@ -89,6 +89,26 @@ class ParacetamolRun
 
         $this->log->progressStart($tests->count());
 
+        $testsNoRerun = new Queue();
+
+        $saveTestsWithForbiddenRerun = function ($runSupervisor) use ($testsNoRerun)
+        {
+            foreach ($runSupervisor->getFailedTestsNoRerun() as $test)
+            {
+                $testsNoRerun->push($test);
+            }
+
+            foreach ($runSupervisor->getTimedOutTests() as $test)
+            {
+                $testsNoRerun->push($test);
+            }
+        };
+
+        if ($continuousRerun)
+        {
+            $runCount = 1; // Supervisor will rerun tests on its own
+        }
+
         for ($i = 0; $i < $runCount; $i++)
         {
             if ($tests->isEmpty())
@@ -97,27 +117,35 @@ class ParacetamolRun
                 break;
             }
 
-            $this->log->verbose('Run ' . ($i+1) . ' of '. $runCount);
+            $this->log->verbose($continuousRerun ? 'Run continuous' : 'Run ' . ($i+1) . ' of '. $runCount);
 
             $queues = $this->partitionInQueues($tests);
             $this->setAdaptiveDelay();
             $this->outputExpectedRunDuration();
 
-            $runSupervisor = $this->runnersSupervisorFactory->get($queues);
+            $runSupervisor = $this->runnersSupervisorFactory->get($queues, $continuousRerun);
             $runSupervisor->run();
 
             $this->sendTestDurations($runSupervisor->getPassedTestsDurations());
-            $tests = $this->skipRerunsForSelectedTests($runSupervisor->getFailedTests());
+
+            $saveTestsWithForbiddenRerun($runSupervisor);
+
+            $tests = $runSupervisor->getFailedTests();
 
             $this->log->verbose('');
         }
 
         $this->log->newLine(2);
 
+        foreach ($testsNoRerun as $test)
+        {
+            $tests->push($test);
+        }
+
         return $tests;
     }
 
-    protected function runInSeries(Queue $tests, int $runCount, string $runName = '') : Queue
+    protected function runInSeries(string $runName, Queue $tests, int $runCount) : Queue
     {
         if ($tests->isEmpty())
         {
@@ -127,6 +155,21 @@ class ParacetamolRun
         $this->log->section($runName . ' Serial Run');
 
         $this->log->progressStart($tests->count());
+
+        $testsNoRerun = new Queue();
+
+        $saveTestsWithForbiddenRerun = function ($runSupervisor) use ($testsNoRerun)
+        {
+            foreach ($runSupervisor->getFailedTestsNoRerun() as $test)
+            {
+                $testsNoRerun->push($test);
+            }
+
+            foreach ($runSupervisor->getTimedOutTests() as $test)
+            {
+                $testsNoRerun->push($test);
+            }
+        };
 
         for ($i = 0; $i < $runCount; $i++)
         {
@@ -143,10 +186,12 @@ class ParacetamolRun
                 [$tests, $clonedTests] = $this->cloneQueue($tests);
             }
 
-            $runSupervisor = $this->runnersSupervisorFactory->get([$tests]);
+            $runSupervisor = $this->runnersSupervisorFactory->get([$tests], false);
             $runSupervisor->run();
 
             $this->sendTestDurations($runSupervisor->getPassedTestsDurations());
+
+            $saveTestsWithForbiddenRerun($runSupervisor);
 
             $tests = $runSupervisor->getFailedTests();
 
@@ -155,12 +200,15 @@ class ParacetamolRun
                 $tests = $clonedTests;
             }
 
-            $tests = $this->skipRerunsForSelectedTests($tests);
-
-            $this->log->verbose(PHP_EOL);
+            $this->log->verbose('');
         }
 
         $this->log->newLine(2);
+
+        foreach ($testsNoRerun as $test)
+        {
+            $tests->push($test);
+        }
 
         return $tests;
     }
@@ -339,26 +387,6 @@ HEREDOC
         $this->settings->setDelayMsec($rpsDelay);
 
         $this->log->veryVerbose("Adaptive delay is set to {$this->settings->getDelaySeconds()} seconds");
-    }
-
-    protected function skipRerunsForSelectedTests(Queue $tests) : Queue
-    {
-        $shouldBeSkipped = new TestNameParts($this->settings->getSkipReruns());
-
-        $result = new Queue();
-
-        /** @var ICodeceptWrapper $test */
-        foreach ($tests as $test)
-        {
-            if ($test->matches($shouldBeSkipped))
-            {
-                continue;
-            }
-
-            $result->push($test);
-        }
-
-        return $result;
     }
 
     protected function outputExpectedRunDuration()

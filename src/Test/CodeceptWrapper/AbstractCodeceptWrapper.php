@@ -134,6 +134,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         catch (ProcessTimedOutException $e)
         {
             $this->timedOut = true;
+            $this->statusDescription = 'TIMEOUT';
         }
 
         return $this->timedOut;

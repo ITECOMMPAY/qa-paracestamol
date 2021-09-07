@@ -69,6 +69,7 @@ php ./paracetamol run acceptance ./tests/ 10 -v --rerun_count 3 --show_first_fai
 Option | Example | Description
 --- | --- | --- 
 rerun_count, r | -r 3 | How many times to rerun failed tests
+continuous_rerun | --continuous_rerun true | If false — tests will be reran only after the run is finished. If true — failed tests will be added to the end of the run queue.
 groups, g | -g cat -g dog | Run only tests marked with the given groups
 delay_msec, d | -d 25 | If several tests try to start at the same time then wait the given delay between these starts. 0 — cancels delay. -1 — automatically calculate the delay using the max_rps option 
 max_rps | --max_rps 50 | Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/min(max_rps, number_of_processes)

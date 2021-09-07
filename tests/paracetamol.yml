@@ -18,6 +18,9 @@ not_dividable_rerun_failed:
 skip_tests:
     - SomeCest.php:test02
 
+skip_reruns:
+    - SomeOtherCest.php:test02
+
 run_before_series:
     - SomeBeforeAfterCest.php:before02
     - SomeBeforeAfterCest.php:before01

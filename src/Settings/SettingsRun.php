@@ -15,6 +15,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     // Options
     protected string    $projectName             =  '';
     protected int       $rerunCount              =   0;
+    protected bool      $continuousRerun         =  false;
     protected array     $env                     =  [];
     protected array     $override                =  [];
     protected int       $delayMsec               =  -1;
@@ -299,6 +300,13 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->serial_before_fails_run = $serial_before_fails_run;
     }
 
+    public function setContinuousRerun(bool $continuousRerun) : void
+    {
+        $this->continuousRerun = $continuousRerun;
+    }
+
+
+
 
 
 
@@ -550,5 +558,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function isSerialBeforeFailsRun() : bool
     {
         return $this->serial_before_fails_run;
+    }
+
+    public function isContinuousRerun() : bool
+    {
+        return $this->continuousRerun;
     }
 }

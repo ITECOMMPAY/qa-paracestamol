@@ -49,6 +49,7 @@ class Run extends Command
             ->addArgument('process_count', InputArgument::REQUIRED, 'Number of parallel processes')
 
             ->addOption('rerun_count',          'r', InputOption::VALUE_REQUIRED, 'Number of reruns for failed tests')
+            ->addOption('continuous_rerun',    null, InputOption::VALUE_REQUIRED, 'If false - tests will be reran only after the run is finished. If true - failed tests will be added to the end of the run queue.')
             ->addOption('groups',               'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Only execute tests marked by the given groups')
             ->addOption('delay_msec',           'd', InputOption::VALUE_REQUIRED, 'Delay in milliseconds (a one thousandth of a second) between sequential test runs')
             ->addOption('env',                 null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in selected environment')
@@ -102,6 +103,7 @@ class Run extends Command
 
             $this->overrideSettings($input, 'project_name');
             $this->overrideSettings($input, 'rerun_count');
+            $this->overrideSettings($input, 'continuous_rerun');
             $this->overrideSettings($input, 'groups');
             $this->overrideSettings($input, 'delay_msec');
             $this->overrideSettings($input, 'max_rps');
@@ -128,7 +130,7 @@ class Run extends Command
             $this->resolveProjectName();
             $this->resolveAdaptiveDelay();
             $this->resolveRunOutputPath();
-
+            $this->resolveOnlyTests();
 
             $this->paracetamolRun->execute();
         }
@@ -187,6 +189,16 @@ class Run extends Command
         }
 
         $this->settings->setRunOutputPath($this->settings->getOutputPath());
+    }
+
+    protected function resolveOnlyTests() : void
+    {
+        if (empty($this->settings->getOnlyTests()))
+        {
+            return;
+        }
+
+        $this->settings->setGroups([]);
     }
 
     protected function loadParacetamolSettings(InputInterface $input) : void
