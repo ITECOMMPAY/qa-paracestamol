@@ -129,7 +129,7 @@ class Parse extends Command
 
     protected function noMemoryLimit(InputInterface $input)
     {
-        if ($input->getOption('no_memory_limit') !== true)
+        if ($input->getOption('no_memory_limit') !== 'true')
         {
             return;
         }
