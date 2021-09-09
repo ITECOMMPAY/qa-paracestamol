@@ -10,10 +10,11 @@ class SettingsParse implements ICodeceptionHelperSettings
     protected string    $resultFile;
 
     // Options
-    protected bool      $cacheTests   = false;
-    protected array     $override     = [];
-    protected array     $env          = [];
-    protected string    $storeCacheIn = '';
+    protected string    $onlyCest          = '';
+    protected bool      $cacheTests        = false;
+    protected array     $override          = [];
+    protected array     $env               = [];
+    protected string    $storeCacheIn      = '';
 
     // Parameters from codeception.yml
     protected array     $codeceptionConfig;
@@ -76,6 +77,31 @@ class SettingsParse implements ICodeceptionHelperSettings
         $this->override = $override;
     }
 
+    public function setResultFile(string $resultFile) : void
+    {
+        $this->resultFile = $resultFile;
+    }
+
+    public function setCacheTests(bool $cacheTests) : void
+    {
+        $this->cacheTests = $cacheTests;
+    }
+
+    public function setEnv(array $env) : void
+    {
+        $this->env = $env;
+    }
+
+    public function setStoreCacheIn(string $storeCacheIn) : void
+    {
+        $this->storeCacheIn = $storeCacheIn;
+    }
+
+    public function setOnlyCest(string $onlyCest) : void
+    {
+        $this->onlyCest = $onlyCest;
+    }
+
     public function getCodeceptionConfigPath() : string
     {
         return $this->codeceptionConfigPath;
@@ -131,19 +157,9 @@ class SettingsParse implements ICodeceptionHelperSettings
         return $this->resultFile;
     }
 
-    public function setResultFile(string $resultFile) : void
-    {
-        $this->resultFile = $resultFile;
-    }
-
     public function isCacheTests() : bool
     {
         return $this->cacheTests;
-    }
-
-    public function setCacheTests(bool $cacheTests) : void
-    {
-        $this->cacheTests = $cacheTests;
     }
 
     public function getEnv() : array
@@ -151,18 +167,13 @@ class SettingsParse implements ICodeceptionHelperSettings
         return $this->env;
     }
 
-    public function setEnv(array $env) : void
-    {
-        $this->env = $env;
-    }
-
     public function getStoreCacheIn() : string
     {
         return $this->storeCacheIn;
     }
 
-    public function setStoreCacheIn(string $storeCacheIn) : void
+    public function getOnlyCest() : string
     {
-        $this->storeCacheIn = $storeCacheIn;
+        return $this->onlyCest;
     }
 }

@@ -82,6 +82,7 @@ bulk_rows_count | --bulk_rows_count 1000 | Used for test duration statistics. Ho
 show_first_fail | --show_first_fail true | Show the output of the first failed test
 cache_tests | --cache_tests true | Parsing a bunch of big tests can take a long time. Paracetamol can cache a parsing results and use them in the further runs. The caching takes some time too and is not recommended if you don't experience the problem with long parsing times
 store_cache_in | --store_cache_in /home/egor | Where to store the parsing cache
+reduce_parser_memory_usage | --reduce_parser_memory_usage true | Reduce the memory usage of tests parser by parsing every file in a separate process. Increases parsing time and disk usage.
 project_name | --project_name ParacetamolTests | Used for test duration statistics. By default your test suite namespace is used as your test project name. You can override it using this option
 parac_config | --parac_config /home/egor/testproject/tests <br />(looks for paracetamol.yml in the directory)<br /><br /> --parac_config /home/egor/testproject/tests/paracetamol_fast.yml <br />OR<br /> --parac_config paracetamol_fast.yml <br />(if your paracetamol config stored in the same directory as your codeception.yml but have a non-default name) | If your paracetamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option
 only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)

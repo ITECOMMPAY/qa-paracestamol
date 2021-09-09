@@ -52,6 +52,11 @@ class Parser
             $realPath = $file->getRealPath();
             $cestName = $file->getRelativePathname();
 
+            if (!$this->cestAllowedForParsing($cestName))
+            {
+                continue;
+            }
+
             $hash = '';
 
             if ($this->settings->isCacheTests())
@@ -71,7 +76,7 @@ class Parser
 
             try
             {
-                $result[$cestName] = $this->parseFromFile($file->getRealPath(), $file->getRelativePathname());
+                $result[$cestName] = $this->parseFromFile($realPath, $cestName);
             }
             catch (\Throwable $e)
             {
@@ -136,5 +141,15 @@ class Parser
         $result['groups'] = $groups;
 
         return $result;
+    }
+
+    protected function cestAllowedForParsing(string $cestName) : bool
+    {
+        if ($this->settings->getOnlyCest() === '')
+        {
+            return true;
+        }
+
+        return $this->settings->getOnlyCest() === $cestName;
     }
 }

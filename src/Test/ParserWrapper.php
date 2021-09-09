@@ -5,6 +5,7 @@ namespace Paracetamol\Test;
 use Paracetamol\Exceptions\LoaderException;
 use Paracetamol\Log\Log;
 use Paracetamol\Settings\SettingsRun;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 class ParserWrapper
@@ -24,44 +25,84 @@ class ParserWrapper
     {
         $this->log->veryVerbose('Parsing tests using a separate process');
 
-        $this->runParser();
+        if ($this->settings->isReduceParserMemoryUsage())
+        {
+            return $this->runParserReducedMemory();
+        }
 
-        return $this->decodeParsedTestsResult();
+        return $this->runParserSimple($this->getParsedTestsResultName());
     }
 
-    protected function runParser()
+    protected function runParserSimple(string $resultFile, string $cestName = '') : array
     {
-        $this->log->debug(' -> creating parser process');
+        $cmd = $this->getParserCmd($resultFile, $cestName);
 
-        $cmd = $this->getParserCmd();
+        $proc = $this->getProcess($cmd);
 
-        $this->proc = new Process($cmd);
-        $this->proc->setTimeout(null);
-        $this->proc->setIdleTimeout(null);
+        $proc->run();
 
-        $this->log->debug($this->proc->getCommandLine());
-
-        $this->proc->run();
-
-        if (!$this->proc->isSuccessful())
+        if (!$proc->isSuccessful())
         {
-            $error = $this->resolveParserError($this->proc);
+            $error = $this->resolveParserError($proc, $resultFile);
 
             throw new LoaderException('Tests parser failed with: ' . $error);
         }
+
+        return $this->decodeParsedTestsResult($resultFile)['data']['cests'] ?? [];
     }
 
-    protected function decodeParsedTestsResult() : array
+    protected function runParserReducedMemory() : array
+    {
+        $testsDir = $this->settings->getTestsPath();
+
+        $files = Finder::create()
+                       ->files()
+                       ->name('*Cest.php')
+                       ->in($testsDir)
+                       ->followLinks()
+                        ;
+
+        $result = [];
+
+        /** @var \Symfony\Component\Finder\SplFileInfo $file */
+        foreach ($files as $file)
+        {
+
+            $cestName = $file->getRelativePathname();
+            $suffix = '__parsed_test_' . $file->getFilenameWithoutExtension();
+
+            $resultFile = $this->getParsedTestsResultName($suffix);
+
+            $result []= $this->runParserSimple($resultFile, $cestName);
+        }
+
+        return array_merge(...$result);
+    }
+
+    protected function getProcess(array $cmd) : Process
+    {
+        $this->log->debug(' -> creating parser process');
+
+        $proc = new Process($cmd);
+        $proc->setTimeout(null);
+        $proc->setIdleTimeout(null);
+
+        $this->log->debug($proc->getCommandLine());
+
+        return $proc;
+    }
+
+    protected function decodeParsedTestsResult(string $resultFile) : array
     {
         $this->log->debug('decoding parser result');
 
-        if (!file_exists($this->getParsedTestsResultName()))
+        if (!file_exists($resultFile))
         {
             $this->log->debug('parser result doesn\'t exist');
             return [];
         }
 
-        $contents = file_get_contents($this->getParsedTestsResultName());
+        $contents = file_get_contents($resultFile);
 
         if ($contents === false)
         {
@@ -77,16 +118,16 @@ class ParserWrapper
             return [];
         }
 
-        @unlink($this->getParsedTestsResultName());
+        @unlink($resultFile);
 
         return $json;
     }
 
-    protected function resolveParserError(Process $proc) : string
+    protected function resolveParserError(Process $proc, string $resultFile) : string
     {
         $errorOutput = empty($proc->getErrorOutput()) ? $proc->getOutput() : $proc->getErrorOutput();
 
-        $result = $this->decodeParsedTestsResult();
+        $result = $this->decodeParsedTestsResult($resultFile);
 
         if (empty($result['data']))
         {
@@ -112,11 +153,11 @@ class ParserWrapper
         return $result;
     }
 
-    protected function getParsedTestsResultName() : string
+    protected function getParsedTestsResultName(string $suffix = '_parsed_tests') : string
     {
         if (empty($this->parsedTestsResultName))
         {
-            $this->parsedTestsResultName = $this->settings->getRunOutputPath() . DIRECTORY_SEPARATOR . $this->settings->getRunId() . '_parsed_tests.json';
+            $this->parsedTestsResultName = $this->settings->getRunOutputPath() . DIRECTORY_SEPARATOR . $this->settings->getRunId() . $suffix . '.json';
 
             $this->log->debug('Parsing result will be placed at: ' . $this->parsedTestsResultName);
         }
@@ -124,15 +165,13 @@ class ParserWrapper
         return $this->parsedTestsResultName;
     }
 
-    protected function getParserCmd() : array
+    protected function getParserCmd(string $resultFile, string $cestName = '') : array
     {
         $paracetamolBin = $this->findParacetamolBinary();
 
         $suite = $this->settings->getSuite();
 
         $codeceptionConfigPath = $this->settings->getTestProjectPath();
-
-        $outputFile = $this->getParsedTestsResultName();
 
         $runOptions = [
             '-vv',
@@ -157,6 +196,12 @@ class ParserWrapper
             $runOptions []= $this->settings->getOverrideAsString();
         }
 
-        return ['php', $paracetamolBin, 'parse', $suite, $codeceptionConfigPath, $outputFile, ...$runOptions];
+        if (!empty($cestName))
+        {
+            $runOptions []= '--only_cest';
+            $runOptions []= $cestName;
+        }
+
+        return ['php', $paracetamolBin, 'parse', $suite, $codeceptionConfigPath, $resultFile, ...$runOptions];
     }
 }

@@ -80,13 +80,13 @@ class Loader
     {
         $parsedTestsResult = $this->parserWrapper->parse();
 
-        if (empty($parsedTestsResult['data']['cests']))
+        if (empty($parsedTestsResult))
         {
             $this->log->debug('No tests found');
             return new Queue();
         }
 
-        $tests = $this->loadCests($parsedTestsResult['data']['cests']);
+        $tests = $this->loadCests($parsedTestsResult);
 
         return $this->filterByOnlyTests($tests);
     }

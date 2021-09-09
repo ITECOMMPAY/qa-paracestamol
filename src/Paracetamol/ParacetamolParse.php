@@ -28,10 +28,17 @@ class ParacetamolParse
         $previousData = $this->tryLoadTestCache($cacheFileName);
 
         $result = $this->parser->parseTests($this->settings->getTestsPath(), $previousData);
+
         $encodedResult = json_encode($result, JSON_THROW_ON_ERROR);
+        $encodedCache = $encodedResult;
 
-        $this->trySaveTestCache($cacheFileName, $encodedResult);
+        if ($this->settings->getOnlyCest() !== '')
+        {
+            $cache = $this->mergeTestCacheWithResult($previousData, $result);
+            $encodedCache = json_encode($cache, JSON_THROW_ON_ERROR);
+        }
 
+        $this->trySaveTestCache($cacheFileName, $encodedCache);
         $this->trySaveResult($encodedResult);
     }
 
@@ -128,5 +135,14 @@ class ParacetamolParse
         {
             throw new ParserException('Can\'t save the current result');
         }
+    }
+
+    protected function mergeTestCacheWithResult(array $previousData, array $parsingResult) : array
+    {
+        $result = $parsingResult;
+
+        $result['data']['cests'] = array_merge($previousData['cests'] ?? [], $parsingResult['data']['cests']);
+
+        return $result;
     }
 }

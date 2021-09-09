@@ -75,6 +75,7 @@ class Run extends Command
             ->addOption('max_rps',             null, InputOption::VALUE_REQUIRED, 'Max allowed RPS. Used in calculation of adaptive delay.')
             ->addOption('bulk_rows_count',     null, InputOption::VALUE_REQUIRED, 'For PostgREST. How many rows insert/get in one request.')
             ->addOption('run_output_path',     null, InputOption::VALUE_REQUIRED, 'Will be used instead the codeception output directory for storing results.')
+            ->addOption('reduce_parser_memory_usage',  null, InputOption::VALUE_REQUIRED, 'Reduce the memory usage by parsing each file in a separate process')
         ;
     }
 
@@ -126,6 +127,7 @@ class Run extends Command
             $this->overrideSettings($input, 'serial_before_fails_run');
             $this->overrideSettings($input, 'bulk_rows_count');
             $this->overrideSettings($input, 'run_output_path');
+            $this->overrideSettings($input, 'reduce_parser_memory_usage');
 
             $this->resolveProjectName();
             $this->resolveAdaptiveDelay();

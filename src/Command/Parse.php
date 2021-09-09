@@ -46,9 +46,10 @@ class Parse extends Command
             ->addArgument('config',        InputArgument::REQUIRED, 'Path to codeception.yml')
             ->addArgument('result_file',   InputArgument::REQUIRED, 'The result file to save')
 
-            ->addOption('override',    'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Override codeception config values')
-            ->addOption('env',        null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in selected environment')
-            ->addOption('cache_tests',null, InputOption::VALUE_REQUIRED, 'Compute a hash for every test file. Save test data with computed hash in a cache file. If the cache file is already exists - use test data from it instead of parsing a test again if the hash for the test matches.')
+            ->addOption('only_cest',     null, InputOption::VALUE_REQUIRED, 'Parse only the cest')
+            ->addOption('override',       'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Override codeception config values')
+            ->addOption('env',           null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in selected environment')
+            ->addOption('cache_tests',   null, InputOption::VALUE_REQUIRED, 'Compute a hash for every test file. Save test data with computed hash in a cache file. If the cache file is already exists - use test data from it instead of parsing a test again if the hash for the test matches.')
             ->addOption('store_cache_in',null, InputOption::VALUE_REQUIRED, 'Store cache in the given folder.')
         ;
     }
@@ -73,6 +74,7 @@ class Parse extends Command
 
             $this->loadCodeceptionConfig($input);
 
+            $this->overrideSettings($input, 'only_cest');
             $this->overrideSettings($input, 'cache_tests');
             $this->overrideSettings($input, 'store_cache_in');
 
