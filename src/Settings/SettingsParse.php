@@ -10,10 +10,11 @@ class SettingsParse implements ICodeceptionHelperSettings
     protected string    $resultFile;
 
     // Options
-    protected bool      $cacheTests   = false;
-    protected array     $override     = [];
-    protected array     $env          = [];
-    protected string    $storeCacheIn = '';
+    protected bool      $cacheTests    = false;
+    protected array     $override      = [];
+    protected array     $env           = [];
+    protected string    $storeCacheIn  = '';
+    protected bool      $noMemoryLimit = false;
 
     // Parameters from codeception.yml
     protected array     $codeceptionConfig;
@@ -164,5 +165,15 @@ class SettingsParse implements ICodeceptionHelperSettings
     public function setStoreCacheIn(string $storeCacheIn) : void
     {
         $this->storeCacheIn = $storeCacheIn;
+    }
+
+    public function isNoMemoryLimit() : bool
+    {
+        return $this->noMemoryLimit;
+    }
+
+    public function setNoMemoryLimit(bool $noMemoryLimit) : void
+    {
+        $this->noMemoryLimit = $noMemoryLimit;
     }
 }

@@ -76,8 +76,9 @@ class Parse extends Command
 
             $this->overrideSettings($input, 'cache_tests');
             $this->overrideSettings($input, 'store_cache_in');
+            $this->overrideSettings($input, 'no_memory_limit');
 
-            $this->noMemoryLimit($input);
+            $this->noMemoryLimit();
 
             $this->paracetamolParse->execute();
         }
@@ -127,9 +128,9 @@ class Parse extends Command
         file_put_contents($resultFile, json_encode($error), LOCK_EX);
     }
 
-    protected function noMemoryLimit(InputInterface $input)
+    protected function noMemoryLimit()
     {
-        if ($input->getOption('no_memory_limit') !== 'true')
+        if (!$this->settings->isNoMemoryLimit())
         {
             return;
         }

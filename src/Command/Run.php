@@ -75,7 +75,7 @@ class Run extends Command
             ->addOption('max_rps',             null, InputOption::VALUE_REQUIRED, 'Max allowed RPS. Used in calculation of adaptive delay.')
             ->addOption('bulk_rows_count',     null, InputOption::VALUE_REQUIRED, 'For PostgREST. How many rows insert/get in one request.')
             ->addOption('run_output_path',     null, InputOption::VALUE_REQUIRED, 'Will be used instead the codeception output directory for storing results.')
-            ->addOption('no_memory_limit',     null, InputOption::VALUE_REQUIRED, "Executes ini_set('memory_limit', '-1'); for parser process")
+            ->addOption('no_memory_limit',     null, InputOption::VALUE_REQUIRED, "Executes ini_set('memory_limit', '-1'); for process")
         ;
     }
 
@@ -133,6 +133,8 @@ class Run extends Command
             $this->resolveAdaptiveDelay();
             $this->resolveRunOutputPath();
             $this->resolveOnlyTests();
+
+            $this->noMemoryLimit();
 
             $this->paracetamolRun->execute();
         }
@@ -229,5 +231,15 @@ class Run extends Command
         $config = file_get_contents($configPath);
 
         $this->settingsSerializer->getSerializer()->deserialize($config, SettingsRun::class, 'yaml', [AbstractNormalizer::OBJECT_TO_POPULATE => $this->settings]);
+    }
+
+    protected function noMemoryLimit()
+    {
+        if (!$this->settings->isNoMemoryLimit())
+        {
+            return;
+        }
+
+        ini_set('memory_limit', '-1');
     }
 }
