@@ -157,6 +157,12 @@ class ParserWrapper
             $runOptions []= $this->settings->getOverrideAsString();
         }
 
+        if ($this->settings->isNoMemoryLimit())
+        {
+            $runOptions []= '--no_memory_limit';
+            $runOptions []= 'true';
+        }
+
         return ['php', $paracetamolBin, 'parse', $suite, $codeceptionConfigPath, $outputFile, ...$runOptions];
     }
 }

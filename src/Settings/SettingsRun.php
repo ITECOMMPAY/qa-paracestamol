@@ -37,6 +37,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected array     $notDividableRerunWhole  =  [];
     protected array     $notDividableRerunFailed =  [];
     protected int       $bulkRowsCount           = 500;
+    protected bool      $noMemoryLimit           =  false;
 
     // Parameters from codeception.yml
     protected array     $codeceptionConfig;
@@ -305,6 +306,13 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->continuousRerun = $continuousRerun;
     }
 
+    public function setNoMemoryLimit(bool $noMemoryLimit) : void
+    {
+        $this->noMemoryLimit = $noMemoryLimit;
+    }
+
+
+
 
 
 
@@ -563,5 +571,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function isContinuousRerun() : bool
     {
         return $this->continuousRerun;
+    }
+
+    public function isNoMemoryLimit() : bool
+    {
+        return $this->noMemoryLimit;
     }
 }

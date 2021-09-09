@@ -46,10 +46,11 @@ class Parse extends Command
             ->addArgument('config',        InputArgument::REQUIRED, 'Path to codeception.yml')
             ->addArgument('result_file',   InputArgument::REQUIRED, 'The result file to save')
 
-            ->addOption('override',    'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Override codeception config values')
-            ->addOption('env',        null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in selected environment')
-            ->addOption('cache_tests',null, InputOption::VALUE_REQUIRED, 'Compute a hash for every test file. Save test data with computed hash in a cache file. If the cache file is already exists - use test data from it instead of parsing a test again if the hash for the test matches.')
-            ->addOption('store_cache_in',null, InputOption::VALUE_REQUIRED, 'Store cache in the given folder.')
+            ->addOption('override',         'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Override codeception config values')
+            ->addOption('env',             null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in selected environment')
+            ->addOption('cache_tests',     null, InputOption::VALUE_REQUIRED, 'Compute a hash for every test file. Save test data with computed hash in a cache file. If the cache file is already exists - use test data from it instead of parsing a test again if the hash for the test matches.')
+            ->addOption('store_cache_in',  null, InputOption::VALUE_REQUIRED, 'Store cache in the given folder.')
+            ->addOption('no_memory_limit', null, InputOption::VALUE_REQUIRED, "Executes ini_set('memory_limit', '-1');")
         ;
     }
 
@@ -75,6 +76,8 @@ class Parse extends Command
 
             $this->overrideSettings($input, 'cache_tests');
             $this->overrideSettings($input, 'store_cache_in');
+
+            $this->noMemoryLimit($input);
 
             $this->paracetamolParse->execute();
         }
@@ -122,5 +125,15 @@ class Parse extends Command
         ];
 
         file_put_contents($resultFile, json_encode($error), LOCK_EX);
+    }
+
+    protected function noMemoryLimit(InputInterface $input)
+    {
+        if ($input->getOption('no_memory_limit') !== true)
+        {
+            return;
+        }
+
+        ini_set('memory_limit', '-1');
     }
 }
