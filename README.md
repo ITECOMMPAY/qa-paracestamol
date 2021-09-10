@@ -66,36 +66,67 @@ Example of the options overriding:
 ```
 php ./paracetamol run acceptance ./tests/ 10 -v --rerun_count 3 --show_first_fail false
 ```
+### Run
+
 Option | Example | Description
 --- | --- | --- 
 rerun_count, r | -r 3 | How many times to rerun failed tests
 continuous_rerun | --continuous_rerun true | If false — tests will be reran only after the run is finished. If true — failed tests will be added to the end of the run queue.
-groups, g | -g cat -g dog | Run only tests marked with the given groups
-delay_msec, d | -d 25 | If several tests try to start at the same time then wait the given delay between these starts. 0 — cancels delay. -1 — automatically calculate the delay using the max_rps option 
+delay_msec, d | -d 25 | If several tests try to start at the same time then wait the given delay between these starts. 0 — cancels delay. -1 — automatically calculate the delay using the max_rps option
 max_rps | --max_rps 50 | Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/min(max_rps, number_of_processes)
-env | --env shuffle,no_lint <br />(will preserve the given order) <br /><br /> --env shuffle --env no_lint <br />(will sort the envs naturally)| Run tests in the selected environment. Note that all env arguments are treated as one environment, the same way if it was merged with ','. Also note that the order in which the environment files are given is NOT preserved when they are given using separate arguments.
-override, o | -o "settings: shuffle: true" | Overrides codeception config values
-run_output_path | --run_output_path /home/egor/output | Overrides the tests output directory
 idle_timeout_sec, t | -t 600 | Terminate a test if it takes more than the given time to run
-stat_endpoint | --stat_endpoint "http://localhost:3000" | See the "Using test duration statistics" section
-bulk_rows_count | --bulk_rows_count 1000 | Used for test duration statistics. How many rows get from the statistics database in a single request.
 show_first_fail | --show_first_fail true | Show the output of the first failed test
-cache_tests | --cache_tests true | Parsing a bunch of big tests can take a long time. Paracetamol can cache a parsing results and use them in the further runs. The caching takes some time too and is not recommended if you don't experience the problem with long parsing times
-store_cache_in | --store_cache_in /home/egor | Where to store the parsing cache
-no_memory_limit | --no_memory_limit true | Tries to turn off PHP memory_limit (better raise it in your PHP settings instead)
-project_name | --project_name ParacetamolTests | Used for test duration statistics. By default your test suite namespace is used as your test project name. You can override it using this option
-parac_config | --parac_config /home/egor/testproject/tests <br />(looks for paracetamol.yml in the directory)<br /><br /> --parac_config /home/egor/testproject/tests/paracetamol_fast.yml <br />OR<br /> --parac_config paracetamol_fast.yml <br />(if your paracetamol config stored in the same directory as your codeception.yml but have a non-default name) | If your paracetamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option
-only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)
-skip_tests | --skip_tests SomeCest.php:test02 | Skip these tests
-skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests
-not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided in separate tests. If any test in the cest is failed then the whole cest will be reran
-not_dividable_rerun_failed | --not_dividable_rerun_failed NotDividableUntilRerunCest.php | These cests should not be divided in separate tests. If a test in the cest is failed then only the failed test will be reran
+
+### Run stages
+
+Option | Example | Description
+--- | --- | --- 
 run_before_series | --run_before_series SomeBeforeAfterCest.php:before01 | Run these tests in the given order before the main run
 rerun_whole_series | --rerun_whole_series true | If a test from the run_before_series option is failed then rerun all tests from the run_before_series option
 serial_before_fails_run | --serial_before_fails_run true | If run_before_series failed even after all reruns then stop the paracetamol execution
 run_before_parallel | --run_before_parallel SomeParallelBeforeCest.php | Run these tests in parallel before the main run
 run_after_parallel | --run_after_parallel parallelAfter | Run these tests in parallel after the main run
 run_after_series | --run_after_series SomeBeforeAfterCest.php:after01 | Run these tests in the given order after all other test runs
+
+### Parsing
+
+Option | Example | Description
+--- | --- | --- 
+cache_tests | --cache_tests true | Parsing a bunch of big tests can take a long time. Paracetamol can cache a parsing results and use them in the further runs. The caching takes some time too and is not recommended if you don't experience the problem with long parsing times
+store_cache_in | --store_cache_in /home/egor | Where to store the parsing cache
+
+### Filtering
+
+Option | Example | Description
+--- | --- | --- 
+groups, g | -g cat -g dog | Run only tests marked with the given groups
+only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)
+skip_tests | --skip_tests SomeCest.php:test02 | Skip these tests
+skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests
+not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided in separate tests. If any test in the cest is failed then the whole cest will be reran
+not_dividable_rerun_failed | --not_dividable_rerun_failed NotDividableUntilRerunCest.php | These cests should not be divided in separate tests. If a test in the cest is failed then only the failed test will be reran
+
+### Environment
+
+Option | Example | Description
+--- | --- | --- 
+env | --env shuffle,no_lint <br />(will preserve the given order) <br /><br /> --env shuffle --env no_lint <br />(will sort the envs naturally)| Run tests in the selected environment. Note that all env arguments are treated as one environment, the same way if it was merged with ','. Also note that the order in which the environment files are given is NOT preserved when they are given using separate arguments.
+override, o | -o "settings: shuffle: true" | Overrides codeception config values
+run_output_path | --run_output_path /home/egor/output | Overrides the tests output directory
+
+### Statistics
+
+Option | Example | Description
+--- | --- | --- 
+stat_endpoint | --stat_endpoint "http://localhost:3000" | See the "Using test duration statistics" section
+project_name | --project_name ParacetamolTests | Used for test duration statistics. By default your test suite namespace is used as your test project name. You can override it using this option
+bulk_rows_count | --bulk_rows_count 1000 | Used for test duration statistics. How many rows get from the statistics database in a single request.
+
+### Paracetamol
+Option | Example | Description
+--- | --- | --- 
+parac_config | --parac_config /home/egor/testproject/tests <br />(looks for paracetamol.yml in the directory)<br /><br /> --parac_config /home/egor/testproject/tests/paracetamol_fast.yml <br />OR<br /> --parac_config paracetamol_fast.yml <br />(if your paracetamol config stored in the same directory as your codeception.yml but have a non-default name) | If your paracetamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option
+no_memory_limit | --no_memory_limit true | Tries to turn off PHP memory_limit (better raise it in your PHP settings instead)
 
 ## Setting test names
 
