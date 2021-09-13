@@ -64,6 +64,8 @@ class Log
 
     protected bool $progressAllowed = true;
 
+    protected int  $progressMax = -1;
+
     public function progressHalt() : void
     {
         $this->progressAllowed = false;
@@ -76,7 +78,14 @@ class Log
 
     public function progressStart(int $max = 0) : void
     {
-        if (!isset($this->style) || $this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
+        if (!isset($this->style))
+        {
+            return;
+        }
+
+        $this->progressMax = $max;
+
+        if ($this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
         {
             return;
         }
@@ -86,8 +95,20 @@ class Log
 
     public function progressAdvance(int $step = 1) : void
     {
-        if (!$this->progressAllowed || !isset($this->style) || $this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
+        if (!isset($this->style) || !$this->progressAllowed)
         {
+            return;
+        }
+
+        --$this->progressMax;
+
+        if ($this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
+        {
+            if ($this->progressMax >= 50 && $this->progressMax % 50 === 0)
+            {
+                $this->verbose("($this->progressMax tests remain)");
+            }
+
             return;
         }
 
@@ -96,7 +117,14 @@ class Log
 
     public function progressFinish() : void
     {
-        if (!isset($this->style) || $this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
+        if (!isset($this->style))
+        {
+            return;
+        }
+
+        $this->progressMax = -1;
+
+        if ($this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
         {
             return;
         }
