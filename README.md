@@ -101,6 +101,7 @@ Option | Example | Description
 --- | --- | --- 
 groups, g | -g cat -g dog | Run only tests marked with the given groups
 only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)
+only_tests_respect_groups | --only_tests_respect_groups true | only_tests don't ignore selected groups
 skip_tests | --skip_tests SomeCest.php:test02 | Skip these tests
 skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests
 not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided in separate tests. If any test in the cest is failed then the whole cest will be reran
