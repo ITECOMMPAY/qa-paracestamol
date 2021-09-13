@@ -38,6 +38,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected array     $notDividableRerunFailed =  [];
     protected int       $bulkRowsCount           = 500;
     protected bool      $noMemoryLimit           =  false;
+    protected bool      $onlyTestsRespectGroups  =  false;
 
     // Parameters from codeception.yml
     protected array     $codeceptionConfig;
@@ -311,6 +312,13 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->noMemoryLimit = $noMemoryLimit;
     }
 
+    public function setOnlyTestsRespectGroups(bool $onlyTestsRespectGroups) : void
+    {
+        $this->onlyTestsRespectGroups = $onlyTestsRespectGroups;
+    }
+
+
+
 
 
 
@@ -576,5 +584,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function isNoMemoryLimit() : bool
     {
         return $this->noMemoryLimit;
+    }
+
+    public function isOnlyTestsRespectGroups() : bool
+    {
+        return $this->onlyTestsRespectGroups;
     }
 }

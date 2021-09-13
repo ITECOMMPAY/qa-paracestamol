@@ -76,6 +76,7 @@ class Run extends Command
             ->addOption('bulk_rows_count',     null, InputOption::VALUE_REQUIRED, 'For PostgREST. How many rows insert/get in one request.')
             ->addOption('run_output_path',     null, InputOption::VALUE_REQUIRED, 'Will be used instead the codeception output directory for storing results.')
             ->addOption('no_memory_limit',     null, InputOption::VALUE_REQUIRED, "Executes ini_set('memory_limit', '-1'); for process")
+            ->addOption('only_tests_respect_groups', null, InputOption::VALUE_REQUIRED, "only_tests don\'t ignore groups")
         ;
     }
 
@@ -128,11 +129,12 @@ class Run extends Command
             $this->overrideSettings($input, 'bulk_rows_count');
             $this->overrideSettings($input, 'run_output_path');
             $this->overrideSettings($input, 'no_memory_limit');
+            $this->overrideSettings($input, 'only_tests_respect_groups');
 
             $this->resolveProjectName();
             $this->resolveAdaptiveDelay();
             $this->resolveRunOutputPath();
-            $this->resolveOnlyTests();
+            $this->resolveOnlyTestsMode();
 
             $this->noMemoryLimit();
 
@@ -195,9 +197,14 @@ class Run extends Command
         $this->settings->setRunOutputPath($this->settings->getOutputPath());
     }
 
-    protected function resolveOnlyTests() : void
+    protected function resolveOnlyTestsMode() : void
     {
         if (empty($this->settings->getOnlyTests()))
+        {
+            return;
+        }
+
+        if ($this->settings->isOnlyTestsRespectGroups())
         {
             return;
         }
