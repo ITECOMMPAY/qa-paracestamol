@@ -76,6 +76,9 @@ delay_msec, d | -d 25 | If several tests try to start at the same time then wait
 max_rps | --max_rps 50 | Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/min(max_rps, number_of_processes)
 idle_timeout_sec, t | -t 600 | Terminate a test if it takes more than the given time to run
 show_first_fail | --show_first_fail true | Show the output of the first failed test
+skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests (see the "Setting test names" section)
+not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided in separate tests. If any test in the cest is failed then the whole cest will be reran
+not_dividable_rerun_failed | --not_dividable_rerun_failed NotDividableUntilRerunCest.php | These cests should not be divided in separate tests. If a test in the cest is failed then only the failed test will be reran
 
 ### Run stages
 
@@ -103,9 +106,6 @@ groups, g | -g cat -g dog | Run only tests marked with the given groups
 only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)
 only_tests_respect_groups | --only_tests_respect_groups true | only_tests don't ignore selected groups
 skip_tests | --skip_tests SomeCest.php:test02 | Skip these tests
-skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests
-not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided in separate tests. If any test in the cest is failed then the whole cest will be reran
-not_dividable_rerun_failed | --not_dividable_rerun_failed NotDividableUntilRerunCest.php | These cests should not be divided in separate tests. If a test in the cest is failed then only the failed test will be reran
 
 ### Environment
 
