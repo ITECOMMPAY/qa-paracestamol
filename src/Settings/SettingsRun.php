@@ -32,8 +32,8 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected array     $runBeforeParallel       =  [];
     protected array     $runAfterSeries          =  [];
     protected array     $runAfterParallel        =  [];
-    protected bool      $rerun_whole_series      =  false;
-    protected bool      $serial_before_fails_run =  false;
+    protected bool      $rerunWholeSeries        =  false;
+    protected bool      $serialBeforeFailsRun    =  false;
     protected array     $notDividableRerunWhole  =  [];
     protected array     $notDividableRerunFailed =  [];
     protected int       $bulkRowsCount           = 500;
@@ -292,14 +292,14 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->storeCacheIn = $storeCacheIn;
     }
 
-    public function setRerunWholeSeries(bool $rerun_whole_series) : void
+    public function setRerunWholeSeries(bool $rerunWholeSeries) : void
     {
-        $this->rerun_whole_series = $rerun_whole_series;
+        $this->rerunWholeSeries = $rerunWholeSeries;
     }
 
-    public function setSerialBeforeFailsRun(bool $serial_before_fails_run) : void
+    public function setSerialBeforeFailsRun(bool $serialBeforeFailsRun) : void
     {
-        $this->serial_before_fails_run = $serial_before_fails_run;
+        $this->serialBeforeFailsRun = $serialBeforeFailsRun;
     }
 
     public function setContinuousRerun(bool $continuousRerun) : void
@@ -568,12 +568,12 @@ class SettingsRun implements ICodeceptionHelperSettings
 
     public function isRerunWholeSeries() : bool
     {
-        return $this->rerun_whole_series;
+        return $this->rerunWholeSeries;
     }
 
     public function isSerialBeforeFailsRun() : bool
     {
-        return $this->serial_before_fails_run;
+        return $this->serialBeforeFailsRun;
     }
 
     public function isContinuousRerun() : bool
