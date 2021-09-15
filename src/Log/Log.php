@@ -106,7 +106,7 @@ class Log
         {
             if ($this->progressMax >= 50 && $this->progressMax % 50 === 0)
             {
-                $this->verbose("($this->progressMax tests remain)");
+                $this->verbose("======= ($this->progressMax tests remain) =======");
             }
 
             return;

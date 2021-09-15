@@ -97,6 +97,12 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     protected function parseFailedTests() : void
     {
+        if ($this->parsedJsonLog === null)
+        {
+            $this->log->note($this . ' -> failed to start' . PHP_EOL . $this->getErrorOutput());
+            return;
+        }
+
         /** @var TestRecord $testRecord */
         foreach ($this->parsedJsonLog->getTests() as $testRecord)
         {
