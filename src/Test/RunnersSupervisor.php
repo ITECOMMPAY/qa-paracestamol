@@ -22,6 +22,7 @@ class RunnersSupervisor
     protected Queue         $failedTests;
     protected Queue         $failedTestsNoRerun;
     protected Queue         $timedOutTests;
+    protected Queue         $markedSkippedTests;
     protected Map           $passedTestsDurations;
     protected Map           $failedTestsRerunCounts;
 
@@ -40,6 +41,7 @@ class RunnersSupervisor
         $this->failedTests          = new Queue();
         $this->failedTestsNoRerun   = new Queue();
         $this->timedOutTests        = new Queue();
+        $this->markedSkippedTests   = new Queue();
 
         $this->passedTestsDurations   = new Map();
         $this->failedTestsRerunCounts = new Map();
@@ -156,6 +158,12 @@ class RunnersSupervisor
             $this->timedOutTests->push($test);
         }
 
+        /** @var ICodeceptWrapper $test */
+        foreach ($runner->getMarkedSkippedTests() as $test)
+        {
+            $this->markedSkippedTests->push($test);
+        }
+
         /**
          * @var string $testName
          * @var int $duration
@@ -170,7 +178,7 @@ class RunnersSupervisor
     {
         if ($this->skipRerunsForTestNames->isEmpty())
         {
-            return $test->isMarkedSkipped();
+            return false;
         }
 
         return $test->matches($this->skipRerunsForTestNames);
@@ -240,6 +248,14 @@ class RunnersSupervisor
     public function getTimedOutTests() : Queue
     {
         return $this->timedOutTests;
+    }
+
+    /**
+     * @return Queue - [ICodeceptWrapper]
+     */
+    public function getMarkedSkippedTests() : Queue
+    {
+        return $this->markedSkippedTests;
     }
 
     /**

@@ -17,6 +17,7 @@ class Runner
     protected Queue    $queue;
     protected Queue    $failedTests;
     protected Queue    $timedOutTests;
+    protected Queue    $markedSkippedTests;
     protected Map      $passedTestsDuration;
 
     protected ?ICodeceptWrapper $currentTest = null;
@@ -32,6 +33,7 @@ class Runner
         $this->queue = $queue;
         $this->failedTests = new Queue();
         $this->timedOutTests = new Queue();
+        $this->markedSkippedTests = new Queue();
         $this->passedTestsDuration = new Map();
     }
 
@@ -75,6 +77,11 @@ class Runner
                 $this->log->verbose('     [TIMEOUT] ' . $this->currentTest . " $this->label");
                 $this->timedOutTests->push($this->currentTest);
             }
+            elseif ($this->currentTest->isMarkedSkipped())
+            {
+                $this->log->verbose('     [MARKED_SKIPPED] ' . $this->currentTest . " $this->label");
+                $this->markedSkippedTests->push($this->currentTest);
+            }
             else
             {
                 $this->log->verbose('     [FAIL] ' . $this->currentTest . " $this->label");
@@ -109,6 +116,14 @@ class Runner
     public function getTimedOutTests() : Queue
     {
         return $this->timedOutTests;
+    }
+
+    /**
+     * @return Queue - [ICodeceptWrapper]
+     */
+    public function getMarkedSkippedTests() : Queue
+    {
+        return $this->markedSkippedTests;
     }
 
     /**
