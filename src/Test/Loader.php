@@ -97,8 +97,11 @@ class Loader
 
         foreach ($cests as $cestName => $cestData)
         {
-            if ($this->cestShouldBeSkipped($cestName))
+            $path = dirname($cestName);
+
+            if ($this->skipTests->getCests()->contains($cestName) || $this->skipTests->getPaths()->contains($path))
             {
+                $this->log->debug($cestName . ' -> skipped (in skip_tests)');
                 continue;
             }
 
@@ -114,7 +117,7 @@ class Loader
                 continue;
             }
 
-            $tests = $this->loadTests($cestName, $cestData);
+            $tests = $this->loadTests($path, $cestName, $cestData);
 
             /** @var ICodeceptWrapper $test */
             foreach ($tests as $test)
@@ -126,7 +129,7 @@ class Loader
         return $result;
     }
 
-    protected function loadTests(string $cestName, array $cestData) : Queue
+    protected function loadTests(string $path, string $cestName, array $cestData) : Queue
     {
         $result = new Queue();
 
@@ -138,7 +141,7 @@ class Loader
 
         foreach ($tests as $testClass => $methods)
         {
-            if ($this->notDividableCestsWhole->getCests()->contains($cestName))
+            if ($this->notDividableCestsWhole->getCests()->contains($cestName) || $this->notDividableCestsWhole->getPaths()->contains($path))
             {
                 $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
 
@@ -147,7 +150,7 @@ class Loader
                 continue;
             }
 
-            if ($this->notDividableCestsOnlyFailed->getCests()->contains($cestName))
+            if ($this->notDividableCestsOnlyFailed->getCests()->contains($cestName) || $this->notDividableCestsOnlyFailed->getPaths()->contains($path))
             {
                 $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
 
@@ -230,19 +233,6 @@ class Loader
         }
 
         return $result;
-    }
-
-    protected function cestShouldBeSkipped(string $cestName) : bool
-    {
-        $path = dirname($cestName);
-
-        if ($this->skipTests->getCests()->contains($cestName) || $this->skipTests->getPaths()->contains($path))
-        {
-            $this->log->debug($cestName . ' -> skipped (in skip_tests)');
-            return true;
-        }
-
-        return false;
     }
 
     protected function filterByOnlyTests(Queue $tests) : Queue
