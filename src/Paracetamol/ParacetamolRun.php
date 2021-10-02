@@ -16,6 +16,7 @@ use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
 use Paracetamol\Test\Delayer;
 use Paracetamol\Test\Partitioner;
 use Paracetamol\Test\Loader;
+use Paracetamol\Test\RunnersSupervisor;
 use Paracetamol\Test\RunnersSupervisorFactory;
 use Paracetamol\Test\Statistics;
 use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
@@ -91,7 +92,7 @@ class ParacetamolRun
 
         $testsNoRerun = new Queue();
 
-        $saveTestsWithForbiddenRerun = function ($runSupervisor) use ($testsNoRerun)
+        $saveTestsWithForbiddenRerun = function (RunnersSupervisor $runSupervisor) use ($testsNoRerun)
         {
             foreach ($runSupervisor->getFailedTestsNoRerun() as $test)
             {
@@ -158,7 +159,7 @@ class ParacetamolRun
 
         $testsNoRerun = new Queue();
 
-        $saveTestsWithForbiddenRerun = function ($runSupervisor) use ($testsNoRerun)
+        $saveTestsWithForbiddenRerun = function (RunnersSupervisor $runSupervisor) use ($testsNoRerun)
         {
             foreach ($runSupervisor->getFailedTestsNoRerun() as $test)
             {

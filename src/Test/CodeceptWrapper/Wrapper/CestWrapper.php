@@ -127,6 +127,11 @@ class CestWrapper extends AbstractCodeceptWrapper
         return $this->failedTestRecords->isEmpty();
     }
 
+    public function isMarkedSkipped() : bool
+    {
+        return false;
+    }
+
     public function getStatusDescription() : string
     {
         if ($this->statusDescription === '' && !$this->failedTestRecords->isEmpty())

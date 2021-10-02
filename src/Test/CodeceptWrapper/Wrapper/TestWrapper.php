@@ -48,6 +48,18 @@ class TestWrapper extends AbstractCodeceptWrapper
         return $testRecord->isPassed();
     }
 
+    public function isMarkedSkipped() : bool
+    {
+        if ($this->parsedJsonLog === null)
+        {
+            return false;
+        }
+
+        /** @var TestRecord $testRecord */
+        $testRecord = $this->parsedJsonLog->getTests()->first()->value;
+        return $testRecord->isSkipped();
+    }
+
     public function getStatusDescription() : string
     {
         if ($this->statusDescription === '' && $this->parsedJsonLog !== null)

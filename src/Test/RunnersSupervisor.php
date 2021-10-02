@@ -170,7 +170,7 @@ class RunnersSupervisor
     {
         if ($this->skipRerunsForTestNames->isEmpty())
         {
-            return false;
+            return $test->isMarkedSkipped();
         }
 
         return $test->matches($this->skipRerunsForTestNames);

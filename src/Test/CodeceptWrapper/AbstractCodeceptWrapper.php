@@ -87,7 +87,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
     {
         if (!file_exists($this->jsonLogFullpath))
         {
-            throw new UsageException('File is not exist: ' . $this->jsonLogFullpath);
+            return;  // Test failed to start
         }
 
         $contents = file_get_contents($this->jsonLogFullpath);

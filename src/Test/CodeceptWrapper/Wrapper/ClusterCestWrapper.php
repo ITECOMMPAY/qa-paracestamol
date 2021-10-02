@@ -198,6 +198,11 @@ class ClusterCestWrapper implements ICodeceptWrapper
         return $this->failedTests->isEmpty() && $this->runner->getTimedOutTests()->isEmpty();
     }
 
+    public function isMarkedSkipped() : bool
+    {
+        return false;
+    }
+
     public function getOutput() : string
     {
         if ($this->isFirstRun())

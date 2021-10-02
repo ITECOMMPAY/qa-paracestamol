@@ -13,8 +13,10 @@ class TestRecord implements Hashable
 
     protected string $method = '';
 
-    public const STATUS_PASS = 'pass';
-    public const STATUS_FAIL = 'fail';
+    public const STATUS_PASS    = 'pass';
+    public const STATUS_FAIL    = 'fail';
+    public const STATUS_ERROR   = 'error';
+    public const STATUS_SKIPPED = 'skipped';
 
     public function __construct(array $record)
     {
@@ -22,6 +24,11 @@ class TestRecord implements Hashable
         $this->status  = $record['status']  ?? '';
         $this->time    = $record['time']    ?? 0.0;
         $this->message = $record['message'] ?? '';
+
+        if ($this->status === static::STATUS_ERROR)
+        {
+            $this->checkIfSkipped($record);
+        }
     }
 
     /**
@@ -43,6 +50,20 @@ class TestRecord implements Hashable
         return $this->method;
     }
 
+    public function checkIfSkipped(array $record)
+    {
+        $trace = $record['trace'] ?? [];
+
+        $step = reset($trace);
+
+        $function = $step['function'] ?? '';
+
+        if ($function === 'markTestSkipped')
+        {
+            $this->status = static::STATUS_SKIPPED;
+        }
+    }
+
     public function getStatus() : string
     {
         return $this->status;
@@ -61,6 +82,11 @@ class TestRecord implements Hashable
     public function isPassed() : bool
     {
         return $this->getStatus() === static::STATUS_PASS;
+    }
+
+    public function isSkipped() : bool
+    {
+        return $this->getStatus() === static::STATUS_SKIPPED;
     }
 
     public function __toString() : string

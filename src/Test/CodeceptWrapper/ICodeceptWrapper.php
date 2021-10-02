@@ -15,6 +15,8 @@ interface ICodeceptWrapper extends Hashable
 
     public function isSuccessful() : bool;
 
+    public function isMarkedSkipped() : bool;
+
     public function getOutput() : string;
 
     public function getErrorOutput() : string;
