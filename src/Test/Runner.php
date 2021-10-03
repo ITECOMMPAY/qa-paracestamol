@@ -42,14 +42,14 @@ class Runner
     {
         if ($this->currentTest === null)
         {
-            if ($this->queue->isEmpty())
+            if ($this->hasEmptyQueue())
             {
                 return false;
             }
 
             if ($this->delayer->allowsTestStart())
             {
-                $this->currentTest = $this->queue->pop();
+                $this->currentTest = $this->popQueue();
                 $this->currentTest->start();
             }
 
@@ -65,7 +65,7 @@ class Runner
         {
             $this->passedTestsDuration->put((string) $this->currentTest, $this->currentTest->getActualDuration());
 
-            $this->log->verbose('[PASS] ' . $this->currentTest . " $this->label");
+            $this->log->verbose('[PASS] ' . $this->currentTest . " {$this->getLabel()}");
 
             if ($this->progressAllowed)
             {
@@ -80,17 +80,17 @@ class Runner
         {
             if ($this->currentTest->isTimedOut())
             {
-                $this->log->verbose('     [TIMEOUT] ' . $this->currentTest . " $this->label");
+                $this->log->verbose('     [TIMEOUT] ' . $this->currentTest . " {$this->getLabel()}");
                 $this->timedOutTests->push($this->currentTest);
             }
             elseif ($this->currentTest->isMarkedSkipped())
             {
-                $this->log->verbose('     [MARKED_SKIPPED] ' . $this->currentTest . " $this->label");
+                $this->log->verbose('     [MARKED_SKIPPED] ' . $this->currentTest . " {$this->getLabel()}");
                 $this->markedSkippedTests->push($this->currentTest);
             }
             else
             {
-                $this->log->verbose('     [FAIL] ' . $this->currentTest . " $this->label");
+                $this->log->verbose('     [FAIL] ' . $this->currentTest . " {$this->getLabel()}");
                 $this->failedTests->push($this->currentTest);
             }
 
@@ -111,6 +111,21 @@ class Runner
         $this->label = $label;
 
         return $this;
+    }
+
+    public function getLabel() : string
+    {
+        return $this->label;
+    }
+
+    public function hasEmptyQueue() : bool
+    {
+        return $this->queue->isEmpty();
+    }
+
+    public function popQueue() : ICodeceptWrapper
+    {
+        return $this->queue->pop();
     }
 
     /**

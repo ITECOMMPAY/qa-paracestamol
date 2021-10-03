@@ -18,6 +18,7 @@ class RunnersSupervisor
     protected RunnerFactory $runnerFactory;
 
     protected Queue         $runners;
+    protected int           $processCount;
 
     protected Queue         $failedTests;
     protected Queue         $failedTestsNoRerun;
@@ -57,7 +58,9 @@ class RunnersSupervisor
      */
     protected function prepareRunners(RunnerFactory $runnerFactory, array $queues) : void
     {
-        $this->log->veryVerbose('Preparing test runners for ' . count($queues) . ' process(es)');
+        $this->processCount = count($queues);
+
+        $this->log->veryVerbose('Preparing test runners for ' . $this->processCount . ' process(es)');
 
         $this->runners = new Queue();
 
@@ -94,6 +97,7 @@ class RunnersSupervisor
         if ($runner->ticking())
         {
             $this->runners->push($runner);
+            $this->tryTakeSomeBurden($runner);
             return;
         }
 
@@ -110,6 +114,30 @@ class RunnersSupervisor
         {
             $this->runners->push($this->runnerFactory->get($queue)->setLabel('(RERUN)'));
         }
+    }
+
+    protected function tryTakeSomeBurden(Runner $runner) : void
+    {
+        if (!$this->continuousRerun)
+        {
+            return;
+        }
+
+        if ($runner->hasEmptyQueue())
+        {
+            return;
+        }
+
+        if ($this->runners->count() >= $this->processCount)
+        {
+            return;
+        }
+
+        $test = $runner->popQueue();
+        $queue = new Queue([$test]);
+        $label = $runner->getLabel();
+
+        $this->runners->push($this->runnerFactory->get($queue)->setLabel($label));
     }
 
     protected function outputFirstFailedTest(Runner $runner) : void
