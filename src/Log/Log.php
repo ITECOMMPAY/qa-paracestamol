@@ -62,19 +62,7 @@ class Log
         throw new UsageException("Logger doesn't have a method with name: $name - that can take arguments: " . json_encode($arguments));
     }
 
-    protected bool $progressAllowed = true;
-
     protected int  $progressMax = -1;
-
-    public function progressHalt() : void
-    {
-        $this->progressAllowed = false;
-    }
-
-    public function progressContinue() : void
-    {
-        $this->progressAllowed = true;
-    }
 
     public function progressStart(int $max = 0) : void
     {
@@ -95,12 +83,12 @@ class Log
 
     public function progressAdvance(int $step = 1) : void
     {
-        if (!isset($this->style) || !$this->progressAllowed)
+        if (!isset($this->style))
         {
             return;
         }
 
-        --$this->progressMax;
+        $this->progressMax -= $step;
 
         if ($this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
         {

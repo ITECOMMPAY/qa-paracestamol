@@ -63,8 +63,8 @@ class ClusterCestWrapper implements ICodeceptWrapper
             return;
         }
 
-        $this->log->progressHalt();
         $this->runner = $this->runnerFactory->get($this->failedTests);
+        $this->runner->forbidAdvancingProgressBar();
     }
 
     protected function isFirstRun() : bool
@@ -96,7 +96,6 @@ class ClusterCestWrapper implements ICodeceptWrapper
         $this->failedTests = $this->collectStrings($this->runner->getFailedTests());
         $this->updateActualDuration();
         $this->updateExpectedDuration();
-        $this->log->progressContinue();
         return false;
     }
 

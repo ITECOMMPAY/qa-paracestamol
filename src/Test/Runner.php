@@ -23,6 +23,7 @@ class Runner
     protected ?ICodeceptWrapper $currentTest = null;
 
     protected string   $label = '';
+    protected bool     $progressAllowed = true;
 
 
     public function __construct(Log $log, Delayer $delayer, Queue $queue)
@@ -65,7 +66,12 @@ class Runner
             $this->passedTestsDuration->put((string) $this->currentTest, $this->currentTest->getActualDuration());
 
             $this->log->verbose('[PASS] ' . $this->currentTest . " $this->label");
-            $this->log->progressAdvance();
+
+            if ($this->progressAllowed)
+            {
+                $this->log->progressAdvance();
+            }
+
             $this->currentTest = null;
             return true;
         }
@@ -93,6 +99,11 @@ class Runner
         }
 
         return true;
+    }
+
+    public function forbidAdvancingProgressBar() : void
+    {
+        $this->progressAllowed = false;
     }
 
     public function setLabel(string $label) : Runner
