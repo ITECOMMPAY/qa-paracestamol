@@ -123,6 +123,11 @@ class Runner
         return $this->queue->isEmpty();
     }
 
+    public function testsCount() : int
+    {
+        return $this->queue->count();
+    }
+
     public function popQueue() : ICodeceptWrapper
     {
         return $this->queue->pop();

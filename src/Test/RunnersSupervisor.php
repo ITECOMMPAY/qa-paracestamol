@@ -116,6 +116,12 @@ class RunnersSupervisor
         }
     }
 
+    /**
+     * If runner has tests in its queue and there is a free process - take a tests from the runner
+     * and start a new runner for the test
+     *
+     * @param Runner $runner
+     */
     protected function tryTakeSomeBurden(Runner $runner) : void
     {
         if (!$this->continuousRerun)
@@ -123,7 +129,7 @@ class RunnersSupervisor
             return;
         }
 
-        if ($runner->hasEmptyQueue())
+        if ($runner->testsCount() < 2)
         {
             return;
         }

@@ -135,7 +135,61 @@ class Partitioner
 
         $this->settings->setMaxRunDuration($maxRunDuration);
 
+        $this->notifyAboutLongTest($result);
+
         return $result;
+    }
+
+    /**
+     * @param Queue[] $queues
+     */
+    protected function notifyAboutLongTest(array $queues) : void
+    {
+        $queuesWithOnlyOneTest = [];
+        $shouldNotify = false;
+
+        foreach ($queues as $queue)
+        {
+            if ($queue->count() !== 1)
+            {
+                $shouldNotify = true;
+                continue;
+            }
+
+            $queuesWithOnlyOneTest []= $queue;
+        }
+
+        if (empty($queuesWithOnlyOneTest))
+        {
+            return;
+        }
+
+        if (!$shouldNotify) // in each queue there is only one test
+        {
+            return;
+        }
+
+        /** @var ICodeceptWrapper|null $testWithLongestDuration */
+        $testWithLongestDuration = null;
+
+        foreach ($queuesWithOnlyOneTest as $queue)
+        {
+            /** @var ICodeceptWrapper $test */
+            $test = $queue->peek();
+
+            if ($testWithLongestDuration === null)
+            {
+                $testWithLongestDuration = $test;
+                continue;
+            }
+
+            if ($testWithLongestDuration->getExpectedDuration() < $test->getExpectedDuration())
+            {
+                $testWithLongestDuration = $test;
+            }
+        }
+
+        $this->log->note("Test $testWithLongestDuration takes {$testWithLongestDuration->getExpectedDuration()} seconds and a whole process to run. The run duration is determined by this test.");
     }
 
     protected function smartPartition(Vector $vector, int $k) : array
