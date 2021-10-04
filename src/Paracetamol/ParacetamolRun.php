@@ -411,10 +411,6 @@ HEREDOC
     {
         $report = [];
 
-        $trimLines = function (string $value) {
-            return implode(PHP_EOL, array_filter(array_map('trim', explode(PHP_EOL, $value)), function ($v) {return $v !== '';}));
-        };
-
         foreach ($queues as $queue)
         {
             /** @var ICodeceptWrapper $test */
@@ -427,17 +423,16 @@ HEREDOC
                 $record = [
                     'type'    => $type,
                     'name'    => $testName,
-                    'message' => $trimLines($message),
+                    'message' => $message,
                 ];
 
                 $report []= $record;
             }
         }
 
-        $trimLongLines = function (string $value) {
-            $lines = explode(PHP_EOL, $value);
-            $firstLine = empty($lines) ? '' : reset($lines);
-            return mb_strlen($firstLine) > 96 ? (mb_substr($firstLine, 0, 92) . ' ...') : $firstLine;
+        $getTrimmedLines = function (string $message) {
+            $trimLine = function (string $line) {return mb_strlen($line) > 96 ? (mb_substr($line, 0, 92) . ' ...') : $line;};
+            return array_map($trimLine, explode(PHP_EOL, $message));
         };
 
         $logLines = [];
@@ -449,15 +444,16 @@ HEREDOC
             foreach ($report as $record)
             {
                 $testName = $record['name'];
-                $message = $trimLongLines($record['message']);
+                $messageLines = $getTrimmedLines($record['message']);
 
                 if ($record['type'] === 'test')
                 {
-                    $logLines []= $testName . (!empty($message) ? ": {$message}" : '');
+                    $firstLine = reset($messageLines);
+                    $logLines []= $testName . ($firstLine !== false ? ": {$firstLine}" : '');
                 }
                 else
                 {
-                    $logLines []= $message;
+                    array_push($logLines, ...$messageLines);
                 }
             }
         }

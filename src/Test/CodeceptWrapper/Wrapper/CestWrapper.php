@@ -141,12 +141,14 @@ class CestWrapper extends AbstractCodeceptWrapper
             /** @var TestRecord $testRecord */
             foreach ($this->failedTestRecords as $testRecord)
             {
-                if ($testRecord->getMessage() === '')
+                $message = $testRecord->getMessagePlain();
+
+                if ($message === '')
                 {
                     continue;
                 }
 
-                $messages []= "$this->cestName:{$testRecord->getMethod()}" . ': ' . $testRecord->getMessage();
+                $messages []= "$this->cestName:{$testRecord->getMethod()}" . ': ' . $message;
             }
 
             $this->statusDescription = implode(PHP_EOL, $messages);

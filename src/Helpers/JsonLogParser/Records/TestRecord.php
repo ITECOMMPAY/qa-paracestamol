@@ -23,7 +23,8 @@ class TestRecord implements Hashable
         $this->test    = $record['test'][1] ?? '';
         $this->status  = $record['status']  ?? '';
         $this->time    = $record['time']    ?? 0.0;
-        $this->message = $record['message'] ?? '';
+        $this->message = trim($record['message'] ?? '');
+
 
         if ($this->status === static::STATUS_ERROR)
         {
@@ -77,6 +78,11 @@ class TestRecord implements Hashable
     public function getMessage() : string
     {
         return $this->message;
+    }
+
+    public function getMessagePlain() : string
+    {
+        return trim(preg_replace('/\s+/', ' ', $this->message));
     }
 
     public function isPassed() : bool

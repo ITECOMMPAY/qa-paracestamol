@@ -66,7 +66,7 @@ class TestWrapper extends AbstractCodeceptWrapper
         {
             /** @var TestRecord $testRecord */
             $testRecord = $this->parsedJsonLog->getTests()->first()->value;
-            $this->statusDescription = $testRecord->getMessage();
+            $this->statusDescription = $testRecord->getMessagePlain();
         }
 
         return $this->statusDescription;
