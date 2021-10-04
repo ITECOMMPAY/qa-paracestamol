@@ -117,8 +117,7 @@ class RunnersSupervisor
     }
 
     /**
-     * If runner has tests in its queue and there is a free process - take a tests from the runner
-     * and start a new runner for the test
+     * If runner has many tests in its queue and there is a free process - move some tests to a new runner
      *
      * @param Runner $runner
      */
@@ -139,9 +138,18 @@ class RunnersSupervisor
             return;
         }
 
-        $test = $runner->popQueue();
-        $queue = new Queue([$test]);
+        $testsToTake = (int) ceil($runner->testsCount() / 2);
+        $queue = new Queue();
+
+        for ($i = 0; $i < $testsToTake; $i++)
+        {
+            $test = $runner->popQueue();
+            $queue->push($test);
+        }
+
         $label = $runner->getLabel();
+
+        $this->log->debug("$testsToTake tests moved to new runner, because there is a free process");
 
         $this->runners->push($this->runnerFactory->get($queue)->setLabel($label));
     }
