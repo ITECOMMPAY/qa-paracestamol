@@ -36,28 +36,34 @@ class Partitioner
 
         $this->settings->setMaxRunDuration(0);
 
-        $queueLength = ceil($tests->count() / $this->settings->getProcessCount());
+        $queuesCount = min($tests->count(), $this->settings->getProcessCount());
 
-        $result = [];
+        $queues = [];
 
-        for ($i = 0; $i < $this->settings->getProcessCount(); $i++)
+        for ($i = 0; $i < $queuesCount; $i++)
         {
-            $queue = new Queue();
-
-            for ($j = 0; $j < $queueLength; $j++)
-            {
-                if ($tests->isEmpty())
-                {
-                    break;
-                }
-
-                $queue->push($tests->pop());
-            }
-
-            $result[$i] = $queue;
+            $queues []= new Queue();
         }
 
-        return $result;
+        $currentQueueNumber = 0;
+
+        $getNextQueue = function () use ($queues, &$currentQueueNumber) : Queue {
+            $queue = $queues[$currentQueueNumber];
+
+            if (++$currentQueueNumber === count($queues))
+            {
+                $currentQueueNumber = 0;
+            }
+
+            return $queue;
+        };
+
+        while (!$tests->isEmpty())
+        {
+            $getNextQueue()->push($tests->pop());
+        }
+
+        return $queues;
     }
 
     /**
