@@ -21,6 +21,7 @@ class Loader
 
     protected TestNameParts $onlyTests;
     protected TestNameParts $skipTests;
+    protected TestNameParts $dividableCests;
     protected TestNameParts $notDividableCestsWhole;
     protected TestNameParts $notDividableCestsOnlyFailed;
 
@@ -33,6 +34,7 @@ class Loader
 
         $this->onlyTests = new TestNameParts([]);
         $this->skipTests = new TestNameParts([]);
+        $this->dividableCests = new TestNameParts([]);
         $this->notDividableCestsWhole = new TestNameParts([]);
         $this->notDividableCestsOnlyFailed = new TestNameParts([]);
     }
@@ -43,6 +45,12 @@ class Loader
     public function getTests() : Queue
     {
         $this->log->veryVerbose('Searching for tests');
+
+        if (!empty($this->settings->getDividable()))
+        {
+            $this->log->veryVerbose('Some cests will be divided into separate tests (as per \'dividable\' setting). ');
+            $this->dividableCests = new TestNameParts($this->settings->getDividable());
+        }
 
         if (!empty($this->settings->getNotDividableRerunWhole()))
         {
@@ -141,29 +149,38 @@ class Loader
 
         foreach ($tests as $testClass => $methods)
         {
+            if ($this->dividableCests->getCests()->contains($cestName) || $this->dividableCests->getPaths()->contains($path))
+            {
+                $this->wrapTests($result, $cestName, $methods, $cestGroups, $expectedGroups);
+
+                continue;
+            }
+
             if ($this->notDividableCestsWhole->getCests()->contains($cestName) || $this->notDividableCestsWhole->getPaths()->contains($path))
             {
-                $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
-
-                $this->loadWholeCest($result, $cestName, $actualGroups, $expectedGroups);
+                $this->wrapWholeCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
 
                 continue;
             }
 
             if ($this->notDividableCestsOnlyFailed->getCests()->contains($cestName) || $this->notDividableCestsOnlyFailed->getPaths()->contains($path))
             {
-                $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
-
-                $this->loadClusterCest($result, $cestName, $actualGroups, $expectedGroups);
+                $this->wrapClusterCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
 
                 continue;
             }
 
-            foreach ($methods as $methodName => $testData)
+            if ($this->settings->getCestWrapper() === 'tests')
             {
-                $actualGroups = $cestGroups->union(new Set($testData['groups'] ?? []));
-
-                $this->loadTest($result, $cestName, $methodName, $actualGroups, $expectedGroups);
+                $this->wrapTests($result, $cestName, $methods, $cestGroups, $expectedGroups);
+            }
+            elseif ($this->settings->getCestWrapper() === 'cest_rerun_whole')
+            {
+                $this->wrapWholeCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
+            }
+            else
+            {
+                $this->wrapClusterCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
             }
         }
 
@@ -175,33 +192,17 @@ class Loader
         return !$expectedGroups->isEmpty() && $actualGroups->intersect($expectedGroups)->isEmpty();
     }
 
-    protected function loadWholeCest(Queue $queue, string $cestName, Set $actualGroups, Set $expectedGroups) : void
+    protected function wrapTests(Queue $queue, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
     {
-        if ($this->notInExpectedGroups($actualGroups, $expectedGroups))
+        foreach ($methods as $methodName => $testData)
         {
-            $this->log->debug($cestName . ' -> skipped (not in a group)');
-            return;
+            $actualGroups = $cestGroups->union(new Set($testData['groups'] ?? []));
+
+            $this->wrapTest($queue, $cestName, $methodName, $actualGroups, $expectedGroups);
         }
-
-        $test = $this->wrapperFactory->getCestWrapper($cestName, $actualGroups, $expectedGroups);
-
-        $queue->push($test);
     }
 
-    protected function loadClusterCest(Queue $queue, string $cestName, Set $actualGroups, Set $expectedGroups) : void
-    {
-        if ($this->notInExpectedGroups($actualGroups, $expectedGroups))
-        {
-            $this->log->debug($cestName . ' -> skipped (not in a group)');
-            return;
-        }
-
-        $test = $this->wrapperFactory->getClusterCestWrapper($cestName, $actualGroups, $expectedGroups);
-
-        $queue->push($test);
-    }
-
-    protected function loadTest(Queue $queue, string $cestName, string $methodName, Set $actualGroups, Set $expectedGroups) : void
+    protected function wrapTest(Queue $queue, string $cestName, string $methodName, Set $actualGroups, Set $expectedGroups) : void
     {
         $testName = "$cestName:$methodName";
 
@@ -218,6 +219,36 @@ class Loader
         }
 
         $test = $this->wrapperFactory->getTestWrapper($cestName, $methodName);
+
+        $queue->push($test);
+    }
+
+    protected function wrapWholeCest(Queue $queue, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
+    {
+        $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
+
+        if ($this->notInExpectedGroups($actualGroups, $expectedGroups))
+        {
+            $this->log->debug($cestName . ' -> skipped (not in a group)');
+            return;
+        }
+
+        $test = $this->wrapperFactory->getCestWrapper($cestName, $actualGroups, $expectedGroups);
+
+        $queue->push($test);
+    }
+
+    protected function wrapClusterCest(Queue $queue, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
+    {
+        $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
+
+        if ($this->notInExpectedGroups($actualGroups, $expectedGroups))
+        {
+            $this->log->debug($cestName . ' -> skipped (not in a group)');
+            return;
+        }
+
+        $test = $this->wrapperFactory->getClusterCestWrapper($cestName, $actualGroups, $expectedGroups);
 
         $queue->push($test);
     }

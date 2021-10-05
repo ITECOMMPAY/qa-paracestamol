@@ -70,6 +70,8 @@ class Run extends Command
             ->addOption('run_before_parallel', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be run before the main run, in parallel.')
             ->addOption('run_after_series',    null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be run after the main run, in series.')
             ->addOption('run_after_parallel',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be run after the main run, in parallel.')
+            ->addOption('cest_wrapper',        null, InputOption::VALUE_REQUIRED, "How to treat cests by default. 'tests' - divide cests into tests (default); 'cest_rerun_whole' - as in option 'not_dividable_rerun_whole'; 'cest_rerun_failed' - as in option 'not_dividable_rerun_failed'.")
+            ->addOption('dividable',           null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should be divided into tests.')
             ->addOption('not_dividable_rerun_whole',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided. If any test in the cest is failed then the whole cest will be rerunned.')
             ->addOption('not_dividable_rerun_failed',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided. If a test in the cest is failed then only the failed test will be rerunned.')
             ->addOption('max_rps',             null, InputOption::VALUE_REQUIRED, 'Max allowed RPS. Used in calculation of adaptive delay.')
@@ -122,6 +124,8 @@ class Run extends Command
             $this->overrideSettings($input, 'run_before_parallel');
             $this->overrideSettings($input, 'run_after_series');
             $this->overrideSettings($input, 'run_after_parallel');
+            $this->overrideSettings($input, 'cest_wrapper');
+            $this->overrideSettings($input, 'dividable');
             $this->overrideSettings($input, 'not_dividable_rerun_whole');
             $this->overrideSettings($input, 'not_dividable_rerun_failed');
             $this->overrideSettings($input, 'rerun_whole_series');

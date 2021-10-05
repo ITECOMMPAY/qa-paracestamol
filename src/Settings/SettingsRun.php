@@ -4,6 +4,7 @@
 namespace Paracetamol\Settings;
 
 use Ds\Set;
+use Paracetamol\Exceptions\UsageException;
 
 class SettingsRun implements ICodeceptionHelperSettings
 {
@@ -15,7 +16,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     // Options
     protected string    $projectName             =  '';
     protected int       $rerunCount              =   0;
-    protected bool      $continuousRerun         =  false;
+    protected bool      $continuousRerun         =  true;
     protected array     $env                     =  [];
     protected array     $override                =  [];
     protected int       $delayMsec               =  -1;
@@ -34,6 +35,8 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected array     $runAfterParallel        =  [];
     protected bool      $rerunWholeSeries        =  false;
     protected bool      $serialBeforeFailsRun    =  false;
+    protected string    $cestWrapper             =  'tests';
+    protected array     $dividable               =  [];
     protected array     $notDividableRerunWhole  =  [];
     protected array     $notDividableRerunFailed =  [];
     protected int       $bulkRowsCount           = 500;
@@ -93,6 +96,16 @@ class SettingsRun implements ICodeceptionHelperSettings
     {
         $this->delayMsec = $milliseconds;
         $this->delaySeconds = $milliseconds / 1000;
+    }
+
+    public function setCestWrapper(string $cestWrapper) : void
+    {
+        if (!in_array($cestWrapper, ['tests', 'cest_rerun_whole', 'cest_rerun_failed']))
+        {
+            throw new UsageException('Unknown cest wrapper: ' . $cestWrapper);
+        }
+
+        $this->cestWrapper = $cestWrapper;
     }
 
     //=================================================
@@ -316,6 +329,13 @@ class SettingsRun implements ICodeceptionHelperSettings
     {
         $this->onlyTestsRespectGroups = $onlyTestsRespectGroups;
     }
+
+    public function setDividable(array $dividable) : void
+    {
+        $this->dividable = $dividable;
+    }
+
+
 
 
 
@@ -589,5 +609,15 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function isOnlyTestsRespectGroups() : bool
     {
         return $this->onlyTestsRespectGroups;
+    }
+
+    public function getCestWrapper() : string
+    {
+        return $this->cestWrapper;
+    }
+
+    public function getDividable() : array
+    {
+        return $this->dividable;
     }
 }

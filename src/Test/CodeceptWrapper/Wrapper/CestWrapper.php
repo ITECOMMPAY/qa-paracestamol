@@ -99,7 +99,7 @@ class CestWrapper extends AbstractCodeceptWrapper
     {
         if ($this->parsedJsonLog === null)
         {
-            $this->log->note($this . ' -> failed to start' . PHP_EOL . $this->getErrorOutput());
+            $this->log->note($this . ' -> broken or timed out' . PHP_EOL . $this->getErrorOutput());
             return;
         }
 
@@ -152,6 +152,11 @@ class CestWrapper extends AbstractCodeceptWrapper
             }
 
             $this->statusDescription = implode(PHP_EOL, $messages);
+        }
+
+        if ($this->statusDescription === 'TIMEOUT')
+        {
+            $this->statusDescription = $this->cestName . ': ' . $this->statusDescription;
         }
 
         return $this->statusDescription;
