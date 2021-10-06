@@ -2,6 +2,7 @@
 
 namespace Paracetamol\Test\CodeceptWrapper\Wrapper;
 
+
 use Ds\Queue;
 use Ds\Set;
 use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
@@ -32,6 +33,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
     protected string                 $statusDescription = '';
     protected float                  $expectedDuration = 0.0;
     protected float                  $actualDuration = 0.0;
+    protected bool                   $hasPassedTests = false;
 
     public function __construct(Log $log, CodeceptWrapperFactory $wrapperFactory, RunnerFactory $runnerFactory, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
     {
@@ -51,6 +53,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
         $this->errorOutput = '';
         $this->statusDescription = '';
         $this->runner = null;
+        $this->hasPassedTests = false;
     }
 
     public function start() : void
@@ -93,6 +96,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
             return true;
         }
 
+        $this->hasPassedTests = !$this->runner->getPassedTestsDuration()->isEmpty();
         $this->failedTests = $this->collectStrings($this->runner->getFailedTests());
         $this->updateActualDuration();
         $this->updateExpectedDuration();
@@ -225,6 +229,16 @@ class ClusterCestWrapper implements ICodeceptWrapper
         }
 
         return $this->errorOutput;
+    }
+
+    public function hasPassedTests() : bool
+    {
+        if ($this->isFirstRun())
+        {
+            return $this->cest->hasPassedTests();
+        }
+
+        return $this->hasPassedTests;
     }
 
     public function getStatusDescription() : string

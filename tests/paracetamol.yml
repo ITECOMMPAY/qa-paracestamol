@@ -7,6 +7,7 @@ max_rps: 50
 idle_timeout_sec: 30
 stat_endpoint: "http://localhost:3000"
 show_first_fail: true
+fast_cest_rerun: true
 
 not_dividable_rerun_whole:
     - NotDividableCest.php
@@ -14,6 +15,7 @@ not_dividable_rerun_whole:
 not_dividable_rerun_failed:
     - NotDividableUntilRerunCest.php
     - NotDividableUntilRerunFlickingCest.php
+    - TotallyBrokenCest.php
     - subfolder
 
 skip_tests:

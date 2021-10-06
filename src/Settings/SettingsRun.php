@@ -35,6 +35,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected array     $runAfterParallel        =  [];
     protected bool      $rerunWholeSeries        =  false;
     protected bool      $serialBeforeFailsRun    =  false;
+    protected bool      $fastCestRerun           =  false;
     protected string    $cestWrapper             =  'tests';
     protected array     $dividable               =  [];
     protected array     $notDividableRerunWhole  =  [];
@@ -335,6 +336,13 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->dividable = $dividable;
     }
 
+    public function setFastCestRerun(bool $fastCestRerun) : void
+    {
+        $this->fastCestRerun = $fastCestRerun;
+    }
+
+
+
 
 
 
@@ -619,5 +627,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function getDividable() : array
     {
         return $this->dividable;
+    }
+
+    public function isFastCestRerun() : bool
+    {
+        return $this->fastCestRerun;
     }
 }

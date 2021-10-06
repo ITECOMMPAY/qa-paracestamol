@@ -10,6 +10,9 @@ use Paracetamol\Helpers\TestNameParts;
 use Paracetamol\Log\Log;
 use Paracetamol\Settings\SettingsRun;
 use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracetamol\Test\CodeceptWrapper\Wrapper\CestWrapper;
+use Paracetamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper;
+use Paracetamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
 
 class RunnersSupervisor
 {
@@ -246,6 +249,15 @@ class RunnersSupervisor
             {
                 $this->failedTestsNoRerun->push($test);
                 continue;
+            }
+
+            if (($test instanceof CestWrapper || $test instanceof ClusterCestWrapper) && $this->settings->isFastCestRerun())
+            {
+                if (!$test->hasPassedTests())
+                {
+                    $this->failedTestsNoRerun->push($test);
+                    continue;
+                }
             }
 
             $result->push($test);

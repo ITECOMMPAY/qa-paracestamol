@@ -74,6 +74,7 @@ class Run extends Command
             ->addOption('dividable',           null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should be divided into tests.')
             ->addOption('not_dividable_rerun_whole',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided. If any test in the cest is failed then the whole cest will be rerunned.')
             ->addOption('not_dividable_rerun_failed',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided. If a test in the cest is failed then only the failed test will be rerunned.')
+            ->addOption('fast_cest_rerun',     null, InputOption::VALUE_REQUIRED, 'Optimize cests rerun by sacrificing their stability.')
             ->addOption('max_rps',             null, InputOption::VALUE_REQUIRED, 'Max allowed RPS. Used in calculation of adaptive delay.')
             ->addOption('bulk_rows_count',     null, InputOption::VALUE_REQUIRED, 'For PostgREST. How many rows insert/get in one request.')
             ->addOption('run_output_path',     null, InputOption::VALUE_REQUIRED, 'Will be used instead the codeception output directory for storing results.')
@@ -130,6 +131,7 @@ class Run extends Command
             $this->overrideSettings($input, 'not_dividable_rerun_failed');
             $this->overrideSettings($input, 'rerun_whole_series');
             $this->overrideSettings($input, 'serial_before_fails_run');
+            $this->overrideSettings($input, 'fast_cest_rerun');
             $this->overrideSettings($input, 'bulk_rows_count');
             $this->overrideSettings($input, 'run_output_path');
             $this->overrideSettings($input, 'no_memory_limit');
