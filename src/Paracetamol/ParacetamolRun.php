@@ -67,7 +67,7 @@ class ParacetamolRun
 
         if ($this->settings->isSerialBeforeFailsRun() && !$failedTests[0]->isEmpty())
         {
-            $this->prepareSimpleFailReport($failedTests);
+            $this->processFailedTests($failedTests);
             throw new SerialBeforeFailedException('Serial before is failed - stopping the script');
         }
 
@@ -76,7 +76,7 @@ class ParacetamolRun
         $failedTests [] = $this->runInParallel('After',  $runAfterInParallel,  $runCount, $this->settings->isContinuousRerun());
         $failedTests [] = $this->runInSeries(  'After',  $runAfterInSeries,    $runCount);
 
-        $this->prepareSimpleFailReport($failedTests);
+        $this->processFailedTests($failedTests);
     }
 
     protected function runInParallel(string $runName, Queue $tests, int $runCount, bool $continuousRerun) : Queue
@@ -127,7 +127,7 @@ class ParacetamolRun
             $runSupervisor = $this->runnersSupervisorFactory->get($queues, $continuousRerun);
             $runSupervisor->run();
 
-            $this->sendTestDurations($runSupervisor->getPassedTestsDurations());
+            $this->sendTestsDurations($runSupervisor->getPassedTestsDurations());
 
             $saveTestsWithForbiddenRerun($runSupervisor);
 
@@ -190,7 +190,7 @@ class ParacetamolRun
             $runSupervisor = $this->runnersSupervisorFactory->get([$tests], false);
             $runSupervisor->run();
 
-            $this->sendTestDurations($runSupervisor->getPassedTestsDurations());
+            $this->sendTestsDurations($runSupervisor->getPassedTestsDurations());
 
             $saveTestsWithForbiddenRerun($runSupervisor);
 
@@ -352,21 +352,21 @@ HEREDOC
         return $tests;
     }
 
-    protected function sendTestDurations(Map $passedTestsDuration)
+    protected function sendTestsDurations(Map $testNameToDuration) : void
     {
         if (empty($this->settings->getStatEndpoint()))
         {
             return;
         }
 
-        if ($passedTestsDuration->isEmpty())
+        if ($testNameToDuration->isEmpty())
         {
             return;
         }
 
         try
         {
-            $this->statistics->sendActualDurations($passedTestsDuration);
+            $this->statistics->sendActualDurations($testNameToDuration);
         }
         catch (\Exception $e)
         {
@@ -407,9 +407,10 @@ HEREDOC
     /**
      * @param Queue[] $queues
      */
-    protected function prepareSimpleFailReport(array $queues)
+    protected function processFailedTests(array $queues) : void
     {
         $report = [];
+        $failedTests = new Queue();
 
         foreach ($queues as $queue)
         {
@@ -427,34 +428,47 @@ HEREDOC
                 ];
 
                 $report []= $record;
+
+                $failedTests->push($test);
             }
         }
+
+        $this->printFailReport($report);
+
+        $this->saveFailReport($report);
+
+        $this->sendNeverPassedTestsDurations($failedTests);
+    }
+
+    protected function printFailReport(array $report) : void
+    {
+        if (empty($report))
+        {
+            return;
+        }
+
+        $logLines = [];
 
         $getTrimmedLines = function (string $message) {
             $trimLine = function (string $line) {return mb_strlen($line) > 96 ? (mb_substr($line, 0, 92) . ' ...') : $line;};
             return array_map($trimLine, explode(PHP_EOL, $message));
         };
 
-        $logLines = [];
+        $this->log->section('Following tests failed');
 
-        if (!empty($report))
+        foreach ($report as $record)
         {
-            $this->log->section('Following tests failed');
+            $testName = $record['name'];
+            $messageLines = $getTrimmedLines($record['message']);
 
-            foreach ($report as $record)
+            if ($record['type'] === 'test')
             {
-                $testName = $record['name'];
-                $messageLines = $getTrimmedLines($record['message']);
-
-                if ($record['type'] === 'test')
-                {
-                    $firstLine = reset($messageLines);
-                    $logLines []= $testName . ($firstLine !== false ? ": {$firstLine}" : '');
-                }
-                else
-                {
-                    array_push($logLines, ...$messageLines);
-                }
+                $firstLine = reset($messageLines);
+                $logLines [] = $testName . ($firstLine !== false ? ": {$firstLine}" : '');
+            }
+            else
+            {
+                array_push($logLines, ...$messageLines);
             }
         }
 
@@ -464,10 +478,45 @@ HEREDOC
         {
             $this->log->normal($logLine);
         }
+    }
 
-        $report = json_encode($report, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+    protected function saveFailReport(array $report) : void
+    {
+        if (empty($report))
+        {
+            return;
+        }
 
-        file_put_contents($this->settings->getRunOutputPath() . DIRECTORY_SEPARATOR . $this->settings->getRunId() . '_failures.json', $report);
+        $encodedReport = json_encode($report, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+
+        file_put_contents($this->settings->getRunOutputPath() . DIRECTORY_SEPARATOR . $this->settings->getRunId() . '_failures.json', $encodedReport);
+    }
+
+    /**
+     * If a test is never passed - it's better to know something about its duration than know nothing at all.
+     *
+     * @param Queue $failedTests
+     */
+    protected function sendNeverPassedTestsDurations(Queue $failedTests) : void
+    {
+        $failedTestsDurations = new Map();
+
+        foreach ($failedTests as $test)
+        {
+            if ($test->getExpectedDuration() !== null)
+            {
+                continue;
+            }
+
+            if ($test->getActualDuration() === null)
+            {
+                continue;
+            }
+
+            $failedTestsDurations->put((string) $test, $test->getActualDuration());
+        }
+
+        $this->sendTestsDurations($failedTestsDurations);
     }
 
     protected function cloneQueue(Queue $queue) : array

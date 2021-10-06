@@ -145,6 +145,11 @@ class ClusterCestWrapper implements ICodeceptWrapper
 
     protected function updateExpectedDuration() : void
     {
+        if ($this->cest->getExpectedDuration() === null)
+        {
+            return;
+        }
+
         if ($this->isFirstRun())
         {
             $totalDuration = $this->cest->getExpectedDuration();

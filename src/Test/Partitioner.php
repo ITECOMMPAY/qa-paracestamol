@@ -79,7 +79,20 @@ class Partitioner
         $testCount = $tests->count();
 
         $durations = new Vector();
-        $durationToTestName = new Map();
+        $durationToTests = new Map();
+        $testsWithoutDuration = new Queue();
+
+        $addToDurationToTestsMap = function (int $duration, ICodeceptWrapper $test) use ($durationToTests)
+        {
+            if (!$durationToTests->hasKey($duration))
+            {
+                $durationToTests->put($duration, new Queue());
+            }
+
+            /** @var Queue $testsWithDuration */
+            $testsWithDuration = $durationToTests->get($duration);
+            $testsWithDuration->push($test);
+        };
 
         /** @var ICodeceptWrapper $test */
         foreach ($tests as $test)
@@ -88,18 +101,11 @@ class Partitioner
 
             if ($duration === null)
             {
-                throw new UsageException('Fetch expected durations for tests before partition them');
+                $testsWithoutDuration->push($test);
+                continue;
             }
 
-            if (!$durationToTestName->hasKey($duration))
-            {
-                $durationToTestName->put($duration, new Queue());
-            }
-
-            /** @var Queue $testsWithDuration */
-            $testsWithDuration = $durationToTestName->get($duration);
-            $testsWithDuration->push($test);
-
+            $addToDurationToTestsMap($duration, $test);
             $durations->push($duration);
         }
 
@@ -108,6 +114,15 @@ class Partitioner
         $this->settings->setMinTestDurationSec($durations->first());
         $this->settings->setMedianTestDurationSec($durations[intdiv($durations->count(), 2)]);
         $this->settings->setMaxTestDurationSec($durations->last());
+
+        /** @var ICodeceptWrapper $test */
+        foreach ($testsWithoutDuration as $test)
+        {
+            $duration = $this->settings->getMedianTestDurationSec();
+
+            $addToDurationToTestsMap($duration, $test);
+            $durations->push($duration);
+        }
 
         $durationsPartitioned = $this->smartPartition($durations, min($this->settings->getProcessCount(), $testCount));
 
@@ -124,7 +139,7 @@ class Partitioner
             foreach ($durationsArray as $duration)
             {
                 /** @var Queue $testsWithDuration */
-                $testsWithDuration = $durationToTestName->get($duration);
+                $testsWithDuration = $durationToTests->get($duration);
                 $queue->push($testsWithDuration->pop());
 
                 $totalRunDuration += $duration;
@@ -183,6 +198,11 @@ class Partitioner
             /** @var ICodeceptWrapper $test */
             $test = $queue->peek();
 
+            if ($test->getExpectedDuration() === null)
+            {
+                continue;
+            }
+
             if ($testWithLongestDuration === null)
             {
                 $testWithLongestDuration = $test;
@@ -195,7 +215,12 @@ class Partitioner
             }
         }
 
-        $this->log->note("Test $testWithLongestDuration takes {$testWithLongestDuration->getExpectedDuration()} seconds and a whole process to run. The run duration is determined by this test.");
+        if ($testWithLongestDuration === null)
+        {
+            return;
+        }
+
+        $this->log->note("Test $testWithLongestDuration takes {$testWithLongestDuration->getExpectedDuration()} seconds and a whole process to run. The minimal run duration is determined by this test.");
     }
 
     protected function smartPartition(Vector $vector, int $k) : array
@@ -228,7 +253,7 @@ class Partitioner
             $result->push(new Vector(), 0);
         }
 
-        //$vector->sort();
+        $vector->sort();
 
         while (!$vector->isEmpty())
         {
@@ -253,6 +278,8 @@ class Partitioner
         $heap = new PriorityQueue();
         $idToNumbers = new Map();
         $idToSum = new Map();
+
+        $vector->sort();
 
         /**
          * Convert every number into an ID that is connected with a numbers array using $idToNumbers map

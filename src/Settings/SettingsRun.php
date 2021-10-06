@@ -63,9 +63,9 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected int       $maxRunDuration = 0;
     protected string    $runOutputPath = '';
     protected float     $delaySeconds = -1;
-    protected int       $minTestDurationSec    = 0;
-    protected int       $maxTestDurationSec    = 0;
-    protected int       $medianTestDurationSec = 0;
+    protected ?int      $minTestDurationSec    = null;
+    protected ?int      $maxTestDurationSec    = null;
+    protected ?int      $medianTestDurationSec = null;
 
     public function getEnvAsString() : string
     {
@@ -531,17 +531,17 @@ class SettingsRun implements ICodeceptionHelperSettings
         return $this->maxRps;
     }
 
-    public function getMinTestDurationSec() : int
+    public function getMinTestDurationSec() : ?int
     {
         return $this->minTestDurationSec;
     }
 
-    public function getMaxTestDurationSec() : int
+    public function getMaxTestDurationSec() : ?int
     {
         return $this->maxTestDurationSec;
     }
 
-    public function getMedianTestDurationSec() : int
+    public function getMedianTestDurationSec() : ?int
     {
         return $this->medianTestDurationSec;
     }

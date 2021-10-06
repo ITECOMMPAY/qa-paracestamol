@@ -28,7 +28,7 @@ class Statistics
         $this->httpClient = $client;
     }
 
-    public function sendActualDurations(Map $durations)
+    public function sendActualDurations(Map $testNameToDuration)
     {
         $this->log->verbose('Sending tests durations to the statistics server');
 
@@ -38,7 +38,7 @@ class Statistics
         $projectId = $this->getNameId('project', $project);
         $envId     = $this->getNameId('environment', $env);
 
-        $testNames = $durations->keys();
+        $testNames = $testNameToDuration->keys();
 
         $records = [];
 
@@ -56,7 +56,7 @@ class Statistics
 
         $records = [];
 
-        foreach ($durations as $testName => $duration)
+        foreach ($testNameToDuration as $testName => $duration)
         {
             $testId = $testNameToId[$testName];
 
@@ -117,19 +117,17 @@ class Statistics
             return $tests;
         }
 
-        $durations = $testNameToDuration->values();
-        $durations->sort();
-        $medianDuration = $durations[intdiv($durations->count(), 2)];
-
-        $this->log->debug('Median duration is: ' . $medianDuration);
-
         $processedTests = new Queue();
 
         /** @var ICodeceptWrapper $test */
         foreach ($tests as $test)
         {
-            $duration = $testNameToDuration->get((string) $test, $medianDuration);
-            $test->setExpectedDuration($duration);
+            if ($testNameToDuration->hasKey((string) $test))
+            {
+                $duration = $testNameToDuration->get((string) $test);
+                $test->setExpectedDuration($duration);
+            }
+
             $processedTests->push($test);
         }
 
