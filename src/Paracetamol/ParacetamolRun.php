@@ -8,6 +8,7 @@ use Codeception\Util\Autoload;
 use DateInterval;
 use Ds\Map;
 use Ds\Queue;
+use Paracetamol\Exceptions\GeneralException;
 use Paracetamol\Exceptions\SerialBeforeFailedException;
 use Paracetamol\Helpers\TestNameParts;
 use Paracetamol\Log\Log;
@@ -21,6 +22,7 @@ use Paracetamol\Test\RunnersSupervisorFactory;
 use Paracetamol\Test\Statistics;
 use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
 use Paracetamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
+use Symfony\Component\Process\Process;
 
 class ParacetamolRun
 {
@@ -45,6 +47,11 @@ class ParacetamolRun
 
     public function execute() : void
     {
+        if (!$this->rebuildActor())
+        {
+            throw new GeneralException('Can\'t rebuild the codeception actor');
+        }
+
         $tests = $this->parseTests();
         $tests = $this->fetchTestDurations($tests);
 
@@ -77,6 +84,29 @@ class ParacetamolRun
         $failedTests [] = $this->runInSeries(  'After',  $runAfterInSeries,    $runCount);
 
         $this->processFailedTests($failedTests);
+    }
+
+    protected function rebuildActor() : bool
+    {
+        $codeceptionBin = $this->settings->getCodeceptionBinPath();
+
+        $runOptions = [
+            '--config', $this->settings->getCodeceptionConfigPath(),
+        ];
+
+        $cmd =  ['php', $codeceptionBin, 'build', ...$runOptions];
+
+        $proc = new Process($cmd);
+        $proc->setTimeout(null);
+        $proc->setIdleTimeout( null);
+        $proc->run();
+
+        if (!$proc->isSuccessful())
+        {
+            $this->log->note($proc->getErrorOutput());
+        }
+
+        return $proc->isSuccessful();
     }
 
     protected function runInParallel(string $runName, Queue $tests, int $runCount, bool $continuousRerun) : Queue

@@ -19,6 +19,7 @@ class TestWrapper extends AbstractCodeceptWrapper
             '-o',       'paths: output: ' . $this->settings->getRunOutputPath(),
             '--no-colors',
             '--no-interaction',
+            '--no-rebuild',
         ];
 
         if (!empty($this->settings->getEnv()))

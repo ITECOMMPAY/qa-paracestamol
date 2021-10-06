@@ -60,6 +60,7 @@ class CestWrapper extends AbstractCodeceptWrapper
             '-o',       'paths: output: ' . $this->settings->getRunOutputPath(),
             '--no-colors',
             '--no-interaction',
+            '--no-rebuild',
         ];
 
         if (!empty($this->groupsRunString))
