@@ -3,6 +3,7 @@
 namespace Paracetamol\Test\CodeceptWrapper\Wrapper;
 
 use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracetamol\Helpers\TextHelper;
 use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
 
 class TestWrapper extends AbstractCodeceptWrapper
@@ -63,11 +64,18 @@ class TestWrapper extends AbstractCodeceptWrapper
 
     public function getStatusDescription() : string
     {
-        if ($this->statusDescription === '' && $this->parsedJsonLog !== null)
+        if ($this->statusDescription === '')
         {
-            /** @var TestRecord $testRecord */
-            $testRecord = $this->parsedJsonLog->getTests()->first()->value;
-            $this->statusDescription = $testRecord->getMessagePlain();
+            if ($this->parsedJsonLog !== null)
+            {
+                /** @var TestRecord $testRecord */
+                $testRecord = $this->parsedJsonLog->getTests()->first()->value;
+                $this->statusDescription = $testRecord->getMessagePlain();
+            }
+            else
+            {
+                $this->statusDescription = TextHelper::strip($this->getErrorOutput());
+            }
         }
 
         return $this->statusDescription;

@@ -6,6 +6,7 @@ use Ds\Set;
 use Ds\Vector;
 use Paracetamol\Helpers\JsonLogParser\JsonLogParserFactory;
 use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracetamol\Helpers\TextHelper;
 use Paracetamol\Log\Log;
 use Paracetamol\Settings\SettingsRun;
 use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
@@ -135,6 +136,11 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     public function getStatusDescription() : string
     {
+        if ($this->parsedJsonLog === null)
+        {
+            $this->statusDescription = $this->cestName . ': ' . TextHelper::strip($this->getErrorOutput());
+        }
+
         if ($this->statusDescription === '' && !$this->failedTestRecords->isEmpty())
         {
             $messages = [];

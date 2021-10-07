@@ -3,6 +3,7 @@
 namespace Paracetamol\Helpers\JsonLogParser\Records;
 
 use Ds\Hashable;
+use Paracetamol\Helpers\TextHelper;
 
 class TestRecord implements Hashable
 {
@@ -82,7 +83,7 @@ class TestRecord implements Hashable
 
     public function getMessagePlain() : string
     {
-        return trim(preg_replace('/\s+/', ' ', $this->message));
+        return TextHelper::strip($this->message);
     }
 
     public function isPassed() : bool

@@ -4,7 +4,7 @@ namespace ParacetamolTests\cases;
 
 use ParacetamolTests\AcceptanceTester;
 
-class TotallyBrokenCest
+class TotallyFailingCest
 {
     /**
      * @param AcceptanceTester $I
