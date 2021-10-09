@@ -60,6 +60,49 @@ class TestNameParts
         return $this->strings;
     }
 
+    public function matchesTest(string $testName) : bool
+    {
+        return $this->getTests()->contains($testName);
+    }
+
+    public function matchesCest(string $cestName) : bool
+    {
+        return $this->getCests()->contains($cestName);
+    }
+
+    public function matchesPath(string $path) : bool
+    {
+        foreach ($this->getSubpaths($path) as $subpath)
+        {
+            if ($this->getPaths()->contains($subpath))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getSubpaths(string $path) : array
+    {
+        $result = [];
+        $parts = explode('/', $path);
+
+        if (count($parts) === 1)
+        {
+            return [$path];
+        }
+
+        while (!empty($parts))
+        {
+            $subpath = implode('/', $parts);
+            $result []= $subpath;
+            array_pop($parts);
+        }
+
+        return $result;
+    }
+
     public function isEmpty() : bool
     {
         return $this->tests->isEmpty() && $this->cests->isEmpty() && $this->paths->isEmpty();

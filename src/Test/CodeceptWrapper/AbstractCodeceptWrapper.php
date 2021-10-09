@@ -164,19 +164,19 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
 
     public function getMatch(TestNameParts $nameParts) : ?string
     {
-        if ($nameParts->getTests()->contains((string) $this))
+        if ($nameParts->matchesTest((string) $this))
         {
             return $this;
         }
 
-        if ($nameParts->getCests()->contains($this->cestName))
+        if ($nameParts->matchesCest($this->cestName))
         {
             return $this->cestName;
         }
 
         $path = dirname($this->cestName);
 
-        if ($nameParts->getPaths()->contains($path))
+        if ($nameParts->matchesPath($path))
         {
             return $path;
         }

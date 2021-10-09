@@ -107,7 +107,7 @@ class Loader
         {
             $path = dirname($cestName);
 
-            if ($this->skipTests->getCests()->contains($cestName) || $this->skipTests->getPaths()->contains($path))
+            if ($this->skipTests->matchesCest($cestName) || $this->skipTests->matchesPath($path))
             {
                 $this->log->debug($cestName . ' -> skipped (in skip_tests)');
                 continue;
@@ -149,21 +149,21 @@ class Loader
 
         foreach ($tests as $testClass => $methods)
         {
-            if ($this->dividableCests->getCests()->contains($cestName) || $this->dividableCests->getPaths()->contains($path))
+            if ($this->dividableCests->matchesCest($cestName) || $this->dividableCests->matchesPath($path))
             {
                 $this->wrapTests($result, $cestName, $methods, $cestGroups, $expectedGroups);
 
                 continue;
             }
 
-            if ($this->notDividableCestsWhole->getCests()->contains($cestName) || $this->notDividableCestsWhole->getPaths()->contains($path))
+            if ($this->notDividableCestsWhole->matchesCest($cestName) || $this->notDividableCestsWhole->matchesPath($path))
             {
                 $this->wrapWholeCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
 
                 continue;
             }
 
-            if ($this->notDividableCestsOnlyFailed->getCests()->contains($cestName) || $this->notDividableCestsOnlyFailed->getPaths()->contains($path))
+            if ($this->notDividableCestsOnlyFailed->matchesCest($cestName) || $this->notDividableCestsOnlyFailed->matchesPath($path))
             {
                 $this->wrapClusterCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
 
@@ -206,7 +206,7 @@ class Loader
     {
         $testName = "$cestName:$methodName";
 
-        if ($this->skipTests->getTests()->contains($testName))
+        if ($this->skipTests->matchesTest($testName))
         {
             $this->log->debug($testName . ' -> skipped (in skip_tests)');
             return;

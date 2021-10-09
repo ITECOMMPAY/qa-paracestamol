@@ -21,6 +21,7 @@ not_dividable_rerun_failed:
 
 skip_tests:
     - SomeCest.php:test02
+    - subfolder/some
 
 skip_reruns:
     - SomeOtherCest.php:test02
