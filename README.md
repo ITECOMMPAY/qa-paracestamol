@@ -106,7 +106,6 @@ Option | Example | Description
 --- | --- | --- 
 groups, g | -g cat -g dog | Run only tests marked with the given groups
 only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)
-only_tests_respect_groups | --only_tests_respect_groups true | only_tests don't ignore selected groups
 skip_tests | --skip_tests SomeCest.php:test02 | Skip these tests
 
 ### Environment
