@@ -35,7 +35,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected array     $runAfterParallel        =  [];
     protected bool      $rerunWholeSeries        =  false;
     protected bool      $serialBeforeFailsRun    =  false;
-    protected bool      $fastCestRerun           =  false;
+    protected bool      $fastCestRerun           =  true;
     protected string    $cestWrapper             =  'tests';
     protected array     $dividable               =  [];
     protected array     $notDividableRerunWhole  =  [];
@@ -56,16 +56,16 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected \DateTime $runStart;
     protected string    $runId;
     protected string    $codeceptionBinPath;
-    protected ?string   $envAsString = null;
-    protected ?string   $overrideAsString = null;
-    protected bool      $adaptiveDelay = true;
+    protected ?string   $envAsString                  = null;
+    protected ?string   $overrideAsString             = null;
+    protected bool      $adaptiveDelay                = true;
     protected bool      $successfullyFetchedDurations = false;
-    protected int       $maxRunDuration = 0;
-    protected string    $runOutputPath = '';
-    protected float     $delaySeconds = -1;
-    protected ?int      $minTestDurationSec    = null;
-    protected ?int      $maxTestDurationSec    = null;
-    protected ?int      $medianTestDurationSec = null;
+    protected int       $maxRunDuration               =  0;
+    protected string    $runOutputPath                = '';
+    protected float     $delaySeconds                 = -1;
+    protected ?int      $minTestDurationSec           = null;
+    protected ?int      $maxTestDurationSec           = null;
+    protected ?int      $medianTestDurationSec        = null;
 
     public function getEnvAsString() : string
     {
