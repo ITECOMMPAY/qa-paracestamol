@@ -81,6 +81,7 @@ cest_wrapper | --cest_wrapper 'cest_rerun_failed' | How to treat cests by defaul
 dividable | --dividable SomeCest.php | These cests should be divided in separate tests. This option is active when cest_wrapper is set to non-default value. 
 not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided in separate tests. If any test in the cest is failed then the whole cest will be reran
 not_dividable_rerun_failed | --not_dividable_rerun_failed NotDividableUntilRerunCest.php | These cests should not be divided in separate tests. If a test in the cest is failed then only the failed test will be reran
+fast_cest_rerun | --fast_cest_rerun false | If all tests selected for the current run (or a rerun) from a Cest are failed — exclude the Cest from the following reruns.
 
 ### Run stages
 
