@@ -47,7 +47,7 @@ class Parse extends Command
             ->addArgument('result_file',   InputArgument::REQUIRED, 'The result file to save')
 
             ->addOption('override',         'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Override codeception config values')
-            ->addOption('env',             null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in selected environment')
+            ->addOption('env',             null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in the selected environment')
             ->addOption('cache_tests',     null, InputOption::VALUE_REQUIRED, 'Compute a hash for every test file. Save test data with computed hash in a cache file. If the cache file is already exists - use test data from it instead of parsing a test again if the hash for the test matches.')
             ->addOption('store_cache_in',  null, InputOption::VALUE_REQUIRED, 'Store cache in the given folder.')
             ->addOption('no_memory_limit', null, InputOption::VALUE_REQUIRED, "Executes ini_set('memory_limit', '-1');")

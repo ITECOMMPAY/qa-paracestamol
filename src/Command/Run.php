@@ -48,37 +48,50 @@ class Run extends Command
             ->addArgument('config',        InputArgument::REQUIRED, 'Path to codeception.yml')
             ->addArgument('process_count', InputArgument::REQUIRED, 'Number of parallel processes')
 
-            ->addOption('rerun_count',          'r', InputOption::VALUE_REQUIRED, 'Number of reruns for failed tests')
-            ->addOption('continuous_rerun',    null, InputOption::VALUE_REQUIRED, 'If false - tests will be reran only after the run is finished. If true - failed tests will be added to the end of the run queue.')
-            ->addOption('groups',               'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Only execute tests marked by the given groups')
-            ->addOption('delay_msec',           'd', InputOption::VALUE_REQUIRED, 'Delay in milliseconds (a one thousandth of a second) between sequential test runs')
-            ->addOption('env',                 null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run tests in selected environment')
-            ->addOption('override',             'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Override codeception config values')
-            ->addOption('idle_timeout_sec',     't', InputOption::VALUE_REQUIRED, 'Test idle timeout')
+            // Run options
+            ->addOption('rerun_count',          'r', InputOption::VALUE_REQUIRED, 'How many times to rerun failed tests')
+            ->addOption('continuous_rerun',    null, InputOption::VALUE_REQUIRED, 'If false - tests will be reran only after the current run is finished. If true - failed tests will be added to the end of the current run queue')
+            ->addOption('delay_msec',           'd', InputOption::VALUE_REQUIRED, 'If several tests try to start at the same time then wait the given delay between these starts.' . PHP_EOL . '0 - cancels delay;' . PHP_EOL . '-1 - automatically calculate the delay using the max_rps option')
+            ->addOption('max_rps',             null, InputOption::VALUE_REQUIRED, 'Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/min(max_rps, number_of_processes)')
+            ->addOption('idle_timeout_sec',     't', InputOption::VALUE_REQUIRED, 'Terminate a test if it takes more than the given time to run')
+            ->addOption('show_first_fail',     null, InputOption::VALUE_REQUIRED, 'Show the output of the first failed test')
+            ->addOption('skip_reruns',         null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Do not rerun these tests')
+            ->addOption('cest_wrapper',        null, InputOption::VALUE_REQUIRED, 'How to treat cests by default:' . PHP_EOL . "'tests' - divide cests into tests (default);" . PHP_EOL . "'cest_rerun_whole' - as in option 'not_dividable_rerun_whole';" . PHP_EOL . "'cest_rerun_failed' - as in option 'not_dividable_rerun_failed'")
+            ->addOption('dividable',           null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should be divided into separate tests. This option is active when cest_wrapper is set to non-default value')
+            ->addOption('not_dividable_rerun_whole',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided into separate tests. If any test in the cest is failed then the whole cest will be reran')
+            ->addOption('not_dividable_rerun_failed',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided into separate tests. If a test in the cest is failed then only the failed test will be reran')
+            ->addOption('fast_cest_rerun',     null, InputOption::VALUE_REQUIRED, 'If all tests selected for the current run (or a rerun) from a Cest are failed - exclude the Cest from the following reruns')
+
+            // Run stages options
+            ->addOption('run_before_series',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in the given order before the main run')
+            ->addOption('rerun_whole_series',  null, InputOption::VALUE_REQUIRED, 'If a test from the run_before_series option is failed then rerun all tests from the run_before_series option')
+            ->addOption('serial_before_fails_run',  null, InputOption::VALUE_REQUIRED, 'If run_before_series failed even after all reruns then stop the paracetamol execution')
+            ->addOption('run_before_parallel', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in parallel before the main run')
+            ->addOption('run_after_parallel',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in parallel after the main run')
+            ->addOption('run_after_series',    null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in the given order after all other test runs')
+
+            // Parsing options
+            ->addOption('cache_tests',         null, InputOption::VALUE_REQUIRED, 'Parsing a bunch of big tests can take a long time. Paracetamol can cache a parsing results and use them in the further runs. The caching takes some time too and is not recommended if you don\'t experience the problem with long parsing times')
+            ->addOption('store_cache_in',      null, InputOption::VALUE_REQUIRED, 'Where to store the parsing cache')
+
+            // Filtering options
+            ->addOption('groups',               'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run only tests marked with the given groups')
+            ->addOption('only_tests',          null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run only these tests')
+            ->addOption('skip_tests',          null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Skip these tests')
+
+            // Environment options
+            ->addOption('env',                 null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, "Run tests in the selected environment. Note that all env arguments are treated as one environment, the same way if it was merged with ','. Also note that the order in which the environment files are given is NOT preserved when they are given using separate arguments.")
+            ->addOption('override',             'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Overrides codeception config values')
+            ->addOption('run_output_path',     null, InputOption::VALUE_REQUIRED, 'Overrides the tests output directory')
+
+            // Statistics options
             ->addOption('stat_endpoint',       null, InputOption::VALUE_REQUIRED, 'PostgREST endpoint for sending test duration statistics')
-            ->addOption('show_first_fail',     null, InputOption::VALUE_REQUIRED, 'Show output of the first failed test')
-            ->addOption('cache_tests',         null, InputOption::VALUE_REQUIRED, 'Compute a hash for every test file. Save test data with computed hash in a cache file. If the cache file is already exists - use test data from it instead of parsing a test again if the hash for the test matches.')
-            ->addOption('store_cache_in',      null, InputOption::VALUE_REQUIRED, 'Store cache in the given folder.')
-            ->addOption('project_name',        null, InputOption::VALUE_REQUIRED, 'Test project name to discern tests for test duration statistics.')
-            ->addOption('parac_config',        null, InputOption::VALUE_REQUIRED, 'Full path to paracetamol config', '')
-            ->addOption('only_tests',          null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run only these tests or cests.')
-            ->addOption('skip_tests',          null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be skipped.')
-            ->addOption('skip_reruns',         null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Do not rerun these tests or cests.')
-            ->addOption('run_before_series',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be run before the main run, in series.')
-            ->addOption('rerun_whole_series',  null, InputOption::VALUE_REQUIRED, 'If a test in a serial run is failed - rerun the whole serial run.')
-            ->addOption('serial_before_fails_run',  null, InputOption::VALUE_REQUIRED, 'If a serial run is failed even after all reruns - stop execution.')
-            ->addOption('run_before_parallel', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be run before the main run, in parallel.')
-            ->addOption('run_after_series',    null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be run after the main run, in series.')
-            ->addOption('run_after_parallel',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests or cests will be run after the main run, in parallel.')
-            ->addOption('cest_wrapper',        null, InputOption::VALUE_REQUIRED, "How to treat cests by default. 'tests' - divide cests into tests (default); 'cest_rerun_whole' - as in option 'not_dividable_rerun_whole'; 'cest_rerun_failed' - as in option 'not_dividable_rerun_failed'.")
-            ->addOption('dividable',           null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should be divided into tests.')
-            ->addOption('not_dividable_rerun_whole',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided. If any test in the cest is failed then the whole cest will be rerunned.')
-            ->addOption('not_dividable_rerun_failed',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided. If a test in the cest is failed then only the failed test will be rerunned.')
-            ->addOption('fast_cest_rerun',     null, InputOption::VALUE_REQUIRED, 'Optimize cests rerun by sacrificing their stability.')
-            ->addOption('max_rps',             null, InputOption::VALUE_REQUIRED, 'Max allowed RPS. Used in calculation of adaptive delay.')
-            ->addOption('bulk_rows_count',     null, InputOption::VALUE_REQUIRED, 'For PostgREST. How many rows insert/get in one request.')
-            ->addOption('run_output_path',     null, InputOption::VALUE_REQUIRED, 'Will be used instead the codeception output directory for storing results.')
-            ->addOption('no_memory_limit',     null, InputOption::VALUE_REQUIRED, "Executes ini_set('memory_limit', '-1'); for process")
+            ->addOption('project_name',        null, InputOption::VALUE_REQUIRED, 'Used for test duration statistics. By default your test suite namespace is used as your test project name. You can override it using this option')
+            ->addOption('bulk_rows_count',     null, InputOption::VALUE_REQUIRED, 'Used for test duration statistics. How many rows get from the statistics database in a single request')
+
+            // Paracetamol options
+            ->addOption('parac_config',        null, InputOption::VALUE_REQUIRED, 'If your paracetamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option', '')
+            ->addOption('no_memory_limit',     null, InputOption::VALUE_REQUIRED, 'Tries to turn off PHP memory_limit (better raise it in your PHP settings instead)')
         ;
     }
 

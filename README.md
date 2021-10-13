@@ -78,9 +78,9 @@ idle_timeout_sec, t | -t 600 | Terminate a test if it takes more than the given 
 show_first_fail | --show_first_fail true | Show the output of the first failed test
 skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests (see the "Setting test names" section)
 cest_wrapper | --cest_wrapper 'cest_rerun_failed' | How to treat cests by default: <br />'tests' — divide cests into tests (default) <br />'cest_rerun_whole' — as in option 'not_dividable_rerun_whole' <br />'cest_rerun_failed' — as in option 'not_dividable_rerun_failed'
-dividable | --dividable SomeCest.php | These cests should be divided in separate tests. This option is active when cest_wrapper is set to non-default value. 
-not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided in separate tests. If any test in the cest is failed then the whole cest will be reran
-not_dividable_rerun_failed | --not_dividable_rerun_failed NotDividableUntilRerunCest.php | These cests should not be divided in separate tests. If a test in the cest is failed then only the failed test will be reran
+dividable | --dividable SomeCest.php | These cests should be divided into separate tests. This option is active when cest_wrapper is set to non-default value. 
+not_dividable_rerun_whole | --not_dividable_rerun_whole NotDividableCest.php | These cests should not be divided into separate tests. If any test in the cest is failed then the whole cest will be reran
+not_dividable_rerun_failed | --not_dividable_rerun_failed NotDividableUntilRerunCest.php | These cests should not be divided into separate tests. If a test in the cest is failed then only the failed test will be reran
 fast_cest_rerun | --fast_cest_rerun false | If all tests selected for the current run (or a rerun) from a Cest are failed — exclude the Cest from the following reruns.
 
 ### Run stages
