@@ -157,3 +157,13 @@ To enable this feature you should do the following:
 2. Create Paracetamol schema using the `create_statistics_schema.php` script (stored in the same folder as this README file)
 3. Install PostgREST (https://postgrest.org/) and start it with the created schema
 4. Pass the PostgREST endpoint to Paracetamol using the `stat_endpoint` option
+
+## Codeception module
+
+To allow paracetamol to enforce a delay between tests of a not dividable Cest (cest_rerun_whole or cest_rerun_failed) you should enable the ParacetamolHelper module in your project config:
+
+```
+modules:
+    enabled:
+        - Paracetamol\Module\ParacetamolHelper
+```

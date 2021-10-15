@@ -5,6 +5,7 @@ namespace Paracetamol\Settings;
 
 use Ds\Set;
 use Paracetamol\Exceptions\UsageException;
+use Paracetamol\Module\ParacetamolHelper;
 
 class SettingsRun implements ICodeceptionHelperSettings
 {
@@ -50,6 +51,8 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected string    $testsPath;
     protected string    $supportPath;
     protected string    $outputPath;
+    protected array     $suiteConfig;
+    protected array     $enabledModules;
 
     // Computed values
     protected Set       $groups;
@@ -66,6 +69,8 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected ?int      $minTestDurationSec           = null;
     protected ?int      $maxTestDurationSec           = null;
     protected ?int      $medianTestDurationSec        = null;
+    protected bool      $paracetamolModuleEnabled     = false;
+    protected string    $paracetamolModuleName        = ParacetamolHelper::class;
 
     public function getEnvAsString() : string
     {
@@ -334,6 +339,32 @@ class SettingsRun implements ICodeceptionHelperSettings
     {
         $this->fastCestRerun = $fastCestRerun;
     }
+
+    public function setParacetamolModuleEnabled(bool $paracetamolModuleEnabled) : void
+    {
+        $this->paracetamolModuleEnabled = $paracetamolModuleEnabled;
+    }
+
+    public function setSuiteConfig(array $suiteConfig) : void
+    {
+        $this->suiteConfig = $suiteConfig;
+    }
+
+    public function setEnabledModules(array $enabledModules) : void
+    {
+        $this->enabledModules = $enabledModules;
+    }
+
+    public function setParacetamolModuleName(string $paracetamolModuleName) : void
+    {
+        $this->paracetamolModuleName = $paracetamolModuleName;
+    }
+
+
+
+
+
+
 
 
 
@@ -621,5 +652,25 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function isFastCestRerun() : bool
     {
         return $this->fastCestRerun;
+    }
+
+    public function isParacetamolModuleEnabled() : bool
+    {
+        return $this->paracetamolModuleEnabled;
+    }
+
+    public function getSuiteConfig() : array
+    {
+        return $this->suiteConfig;
+    }
+
+    public function getEnabledModules() : array
+    {
+        return $this->enabledModules;
+    }
+
+    public function getParacetamolModuleName() : string
+    {
+        return $this->paracetamolModuleName;
     }
 }

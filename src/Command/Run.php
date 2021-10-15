@@ -4,9 +4,11 @@
 namespace Paracetamol\Command;
 
 
-use Paracetamol\Helpers\CodeceptionSettingsParser;
+use Codeception\Configuration;
+use Paracetamol\Helpers\CodeceptionProjectParser;
 use Paracetamol\Helpers\CommandParamsToSettingsSaver;
 use Paracetamol\Log\Log;
+use Paracetamol\Module\ParacetamolHelper;
 use Paracetamol\Paracetamol\ParacetamolRun;
 use Paracetamol\Settings\SettingsRun;
 use Paracetamol\Settings\SettingsSerializer;
@@ -21,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class Run extends Command
 {
     use CommandParamsToSettingsSaver;
-    use CodeceptionSettingsParser;
+    use CodeceptionProjectParser;
 
     protected Log                $log;
     protected SettingsRun        $settings;
@@ -151,6 +153,7 @@ class Run extends Command
             $this->resolveProjectName();
             $this->resolveAdaptiveDelay();
             $this->resolveRunOutputPath();
+            $this->resolveParacetamolModule();
 
             $this->noMemoryLimit();
 
@@ -211,6 +214,25 @@ class Run extends Command
         }
 
         $this->settings->setRunOutputPath($this->settings->getOutputPath());
+    }
+
+    protected function resolveParacetamolModule() : void
+    {
+        $enabledModules = $this->settings->getEnabledModules();
+
+        $classWithoutFirstSlash = substr(ParacetamolHelper::class, 0);
+
+        if (in_array(ParacetamolHelper::class, $enabledModules))
+        {
+            $this->settings->setParacetamolModuleEnabled(true);
+            return;
+        }
+
+        if (in_array($classWithoutFirstSlash, $enabledModules))
+        {
+            $this->settings->setParacetamolModuleName($classWithoutFirstSlash);
+            return;
+        }
     }
 
     protected function loadParacetamolSettings(InputInterface $input) : void

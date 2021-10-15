@@ -2,7 +2,7 @@
 
 namespace Paracetamol\Command;
 
-use Paracetamol\Helpers\CodeceptionSettingsParser;
+use Paracetamol\Helpers\CodeceptionProjectParser;
 use Paracetamol\Helpers\CommandParamsToSettingsSaver;
 use Paracetamol\Log\Log;
 use Paracetamol\Paracetamol\ParacetamolParse;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class Parse extends Command
 {
     use CommandParamsToSettingsSaver;
-    use CodeceptionSettingsParser;
+    use CodeceptionProjectParser;
 
     protected Log                $log;
     protected SettingsParse      $settings;

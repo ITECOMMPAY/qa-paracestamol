@@ -37,7 +37,7 @@ class ParacetamolParse
 
     protected function getTestCacheFileName() : string
     {
-        $prefix = sha1(json_encode($this->settings->getCodeceptionConfig()));
+        $prefix = sha1(json_encode($this->settings->getSuiteConfig()));
 
         if (!empty($this->settings->getStoreCacheIn()))
         {

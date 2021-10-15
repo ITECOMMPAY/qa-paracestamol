@@ -16,6 +16,10 @@ interface ICodeceptionHelperSettings
 
     public function getCodeceptionConfig() : array;
 
+    public function setSuiteConfig(array $suiteConfig) : void;
+
+    public function getSuiteConfig() : array;
+
     public function setOverride(array $override) : void;
 
     public function getOverride() : array;
@@ -43,4 +47,8 @@ interface ICodeceptionHelperSettings
     public function setNamespace(string $namespace) : void;
 
     public function getNamespace() : string;
+
+    public function getEnabledModules() : array;
+
+    public function setEnabledModules(array $enabledModules) : void;
 }

@@ -23,6 +23,8 @@ class SettingsParse implements ICodeceptionHelperSettings
     protected string    $testsPath;
     protected string    $supportPath;
     protected string    $outputPath;
+    protected array     $suiteConfig;
+    protected array     $enabledModules;
 
     // Computed values
     protected string    $codeceptionBinPath;
@@ -175,5 +177,25 @@ class SettingsParse implements ICodeceptionHelperSettings
     public function setNoMemoryLimit(bool $noMemoryLimit) : void
     {
         $this->noMemoryLimit = $noMemoryLimit;
+    }
+
+    public function getSuiteConfig() : array
+    {
+        return $this->suiteConfig;
+    }
+
+    public function setSuiteConfig(array $suiteConfig) : void
+    {
+        $this->suiteConfig = $suiteConfig;
+    }
+
+    public function getEnabledModules() : array
+    {
+        return $this->enabledModules;
+    }
+
+    public function setEnabledModules(array $enabledModules) : void
+    {
+        $this->enabledModules = $enabledModules;
     }
 }

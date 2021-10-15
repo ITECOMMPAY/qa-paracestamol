@@ -2,7 +2,6 @@
 
 namespace Paracetamol\Test\CodeceptWrapper;
 
-use Paracetamol\Exceptions\UsageException;
 use Paracetamol\Helpers\JsonLogParser\JsonLogParser;
 use Paracetamol\Helpers\JsonLogParser\JsonLogParserFactory;
 use Paracetamol\Helpers\TestNameParts;
@@ -67,7 +66,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         $this->tryDeleteJsonLog();
     }
 
-    public function start()
+    public function start() : void
     {
         $this->reset();
 
@@ -76,6 +75,9 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         $this->proc = new Process($cmd);
         $this->proc->setTimeout(null);
         $this->proc->setIdleTimeout($this->settings->getIdleTimeoutSec() !== -1 ? $this->settings->getIdleTimeoutSec() : null);
+
+        $this->configureProcess($this->proc);
+
         $this->proc->start();
 
         $this->startTime = time();
@@ -83,7 +85,12 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         $this->log->debug($this->proc->getCommandLine());
     }
 
-    private function parseJsonLog()
+    protected function configureProcess(Process $proc) : void
+    {
+
+    }
+
+    private function parseJsonLog() : void
     {
         if (!file_exists($this->jsonLogFullpath))
         {
@@ -134,7 +141,6 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         catch (ProcessTimedOutException $e)
         {
             $this->timedOut = true;
-            $this->statusDescription = 'TIMEOUT';
         }
 
         return $this->timedOut;
@@ -153,6 +159,11 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
     public function getErrorOutput() : string
     {
         return $this->proc->getErrorOutput();
+    }
+
+    protected function getIncrementalOutput() : string
+    {
+        return $this->proc->getIncrementalOutput();
     }
 
     abstract public function getStatusDescription() : string;

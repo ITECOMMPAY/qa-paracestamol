@@ -8,6 +8,7 @@ idle_timeout_sec: 30
 stat_endpoint: "http://localhost:3000"
 show_first_fail: true
 fast_cest_rerun: true
+cest_wrapper: cest_rerun_failed
 
 not_dividable_rerun_whole:
     - NotDividableCest.php

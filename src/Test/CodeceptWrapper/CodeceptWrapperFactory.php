@@ -11,6 +11,7 @@ use Paracetamol\Settings\SettingsRun;
 use Paracetamol\Test\CodeceptWrapper\Wrapper\CestWrapper;
 use Paracetamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper;
 use Paracetamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
+use Paracetamol\Test\Delayer;
 use Paracetamol\Test\RunnerFactory;
 
 class CodeceptWrapperFactory
@@ -18,13 +19,15 @@ class CodeceptWrapperFactory
     protected Log                  $log;
     protected SettingsRun          $settings;
     protected JsonLogParserFactory $jsonLogParserFactory;
+    protected Delayer              $delayer;
     protected RunnerFactory        $runnerFactory;
 
-    public function __construct(Log $log, SettingsRun $settings, JsonLogParserFactory $jsonLogParserFactory, RunnerFactory $runnerFactory)
+    public function __construct(Log $log, SettingsRun $settings, JsonLogParserFactory $jsonLogParserFactory, Delayer $delayer, RunnerFactory $runnerFactory)
     {
         $this->log                  = $log;
         $this->settings             = $settings;
         $this->jsonLogParserFactory = $jsonLogParserFactory;
+        $this->delayer              = $delayer;
         $this->runnerFactory        = $runnerFactory;
     }
 
@@ -35,7 +38,7 @@ class CodeceptWrapperFactory
 
     public function getCestWrapper(string $cestName, Set $actualGroups, ?Set $expectedGroups = null) : CestWrapper
     {
-        return new CestWrapper($this->log, $this->settings, $this->jsonLogParserFactory, $cestName, $actualGroups, $expectedGroups);
+        return new CestWrapper($this->log, $this->settings, $this->jsonLogParserFactory, $this->delayer, $cestName, $actualGroups, $expectedGroups);
     }
 
     public function getClusterCestWrapper(string $cestName, Set $actualGroups, ?Set $expectedGroups = null) : ClusterCestWrapper

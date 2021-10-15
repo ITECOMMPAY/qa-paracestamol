@@ -7,7 +7,7 @@ use Paracetamol\Helpers\TestNameParts;
 
 interface ICodeceptWrapper extends Hashable
 {
-    public function start();
+    public function start() : void;
 
     public function isRunning() : bool;
 

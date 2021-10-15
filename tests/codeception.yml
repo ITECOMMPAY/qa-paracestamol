@@ -6,6 +6,8 @@ suites:
         actor: AcceptanceTester
         path: .
         modules:
+            enabled:
+                - Paracetamol\Module\ParacetamolHelper
                 
 extensions:
 

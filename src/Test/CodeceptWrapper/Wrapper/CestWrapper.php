@@ -8,22 +8,33 @@ use Paracetamol\Helpers\JsonLogParser\JsonLogParserFactory;
 use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
 use Paracetamol\Helpers\TextHelper;
 use Paracetamol\Log\Log;
+use Paracetamol\Module\ParacetamolHelper;
 use Paracetamol\Settings\SettingsRun;
 use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
+use Paracetamol\Test\Delayer;
+use Symfony\Component\Process\InputStream;
+use Symfony\Component\Process\Process;
 
 class CestWrapper extends AbstractCodeceptWrapper
 {
+    protected Delayer $delayer;
+
     protected string $groupsRunString;
 
     protected Vector $passedTestRecords;
     protected Vector $failedTestRecords;
 
-    public function __construct(Log $log, SettingsRun $settings, JsonLogParserFactory $jsonLogParserFactory, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
+    protected ?InputStream $inputStream = null;
+    protected bool $waitsUntilTestStartAllowed = false;
+
+    public function __construct(Log $log, SettingsRun $settings, JsonLogParserFactory $jsonLogParserFactory, Delayer $delayer, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
     {
         parent::__construct($log, $settings, $jsonLogParserFactory, $cestName, $this->determineName($actualGroups, $expectedGroups));
 
         $this->passedTestRecords = new Vector();
         $this->failedTestRecords = new Vector();
+
+        $this->delayer = $delayer;
     }
 
     protected function determineName(Set $actualGroups, ?Set $expectedGroups) : string
@@ -45,8 +56,10 @@ class CestWrapper extends AbstractCodeceptWrapper
     {
         parent::reset();
 
-        $this->passedTestRecords = new Vector();
-        $this->failedTestRecords = new Vector();
+        $this->passedTestRecords          = new Vector();
+        $this->failedTestRecords          = new Vector();
+        $this->inputStream                = null;
+        $this->waitsUntilTestStartAllowed = false;
     }
 
     protected function getCmd() : array
@@ -76,6 +89,12 @@ class CestWrapper extends AbstractCodeceptWrapper
             $runOptions []= $this->settings->getEnvAsString();
         }
 
+        if ($this->settings->isParacetamolModuleEnabled())
+        {
+            $runOptions []= '-o';
+            $runOptions []= 'modules: config: ' . $this->settings->getParacetamolModuleName() . ': pause_before_test: true';
+        }
+
         if (!empty($this->settings->getOverride()))
         {
             $runOptions []= '-o';
@@ -85,16 +104,64 @@ class CestWrapper extends AbstractCodeceptWrapper
         return ['php', $codeceptionBin, 'run', $suite, $this->cestName, ...$runOptions];
     }
 
+    protected function configureProcess(Process $proc) : void
+    {
+        if (!$this->settings->isParacetamolModuleEnabled())
+        {
+            return;
+        }
+
+        $this->inputStream = new InputStream();
+
+        $proc->setInput($this->inputStream);
+    }
+
     public function isRunning() : bool
     {
         $result = parent::isRunning();
 
-        if (!$result)
+        if ($result)
+        {
+            $this->allowTestStart();
+        }
+        else
         {
             $this->parseFailedTests();
         }
 
         return $result;
+    }
+
+    protected function allowTestStart() : void
+    {
+        if (!$this->settings->isParacetamolModuleEnabled())
+        {
+            return;
+        }
+
+        if ($this->settings->getDelayMsec() === 0)
+        {
+            return;
+        }
+
+        if (!$this->waitsUntilTestStartAllowed)
+        {
+            $prompt = mb_substr($this->getIncrementalOutput(), -strlen(ParacetamolHelper::ALLOW_TEST_START_PROMPT));
+
+            if ($prompt !== ParacetamolHelper::ALLOW_TEST_START_PROMPT)
+            {
+                return;
+            }
+        }
+
+        if (!$this->delayer->allowsTestStart())
+        {
+            $this->waitsUntilTestStartAllowed = true;
+            return;
+        }
+
+        $this->waitsUntilTestStartAllowed = false;
+        $this->inputStream->write("Y\n");
     }
 
     protected function parseFailedTests() : void
@@ -136,9 +203,14 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     public function getStatusDescription() : string
     {
-        if ($this->parsedJsonLog === null)
+        if ($this->statusDescription === '' && $this->isTimedOut())
         {
-            $this->statusDescription = $this->cestName . ': ' . TextHelper::strip($this->getErrorOutput());
+            $this->statusDescription = $this->cestName . ': TIMEOUT';
+        }
+
+        if ($this->statusDescription === '' && $this->parsedJsonLog === null)
+        {
+            $this->statusDescription = $this->cestName . ': BROKEN ' . TextHelper::strip($this->getErrorOutput());
         }
 
         if ($this->statusDescription === '' && !$this->failedTestRecords->isEmpty())
@@ -159,11 +231,6 @@ class CestWrapper extends AbstractCodeceptWrapper
             }
 
             $this->statusDescription = implode(PHP_EOL, $messages);
-        }
-
-        if ($this->statusDescription === 'TIMEOUT')
-        {
-            $this->statusDescription = $this->cestName . ': ' . $this->statusDescription;
         }
 
         return $this->statusDescription;
