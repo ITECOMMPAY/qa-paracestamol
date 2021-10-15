@@ -72,8 +72,8 @@ Option | Example | Description
 --- | --- | --- 
 rerun_count, r | -r 3 | How many times to rerun failed tests
 continuous_rerun | --continuous_rerun true | If false — tests will be reran only after the run is finished. If true — failed tests will be added to the end of the run queue.
-delay_msec, d | -d 25 | If several tests try to start at the same time then wait the given delay between these starts. 0 — cancels delay. -1 — automatically calculate the delay using the max_rps option
-max_rps | --max_rps 50 | Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/min(max_rps, number_of_processes)
+delay_msec, d | -d 25 | If several tests try to start at the same time then wait the given delay between these starts. 0 — cancels delay. -1 — automatically calculate the delay using the max_rps option. The bigger the delay the less is load on your CPU and application.
+max_rps | --max_rps 50 | Used to calculate delay if the delay_msec option is set to -1. delay_msec will be set to 1000/min(max_rps, number_of_processes). Paracetamol can't send more than 100 RPS.
 idle_timeout_sec, t | -t 600 | Terminate a test if it takes more than the given time to run
 show_first_fail | --show_first_fail true | Show the output of the first failed test
 skip_reruns | --skip_reruns SomeOtherCest.php:test02 | Do not rerun these tests (see the "Setting test names" section)

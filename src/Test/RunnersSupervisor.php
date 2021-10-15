@@ -86,7 +86,7 @@ class RunnersSupervisor
                 $this->touchRunner();
             }
 
-            usleep(10000); // max 100 RPS, but CPU usage should go down
+            usleep($this->settings->getTickFrequencyUs());
         }
     }
 

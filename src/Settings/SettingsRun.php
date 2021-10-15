@@ -66,6 +66,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected int       $maxRunDuration               =  0;
     protected string    $runOutputPath                = '';
     protected float     $delaySeconds                 = -1;
+    protected int       $tickFrequencyUs              =  0;
     protected ?int      $minTestDurationSec           = null;
     protected ?int      $maxTestDurationSec           = null;
     protected ?int      $medianTestDurationSec        = null;
@@ -101,6 +102,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     {
         $this->delayMsec = $milliseconds;
         $this->delaySeconds = $milliseconds / 1000;
+
+        $durationCorrected = $milliseconds - 20;
+        $durationCorrected = $durationCorrected < 0 ? 0 : $durationCorrected;
+        $this->tickFrequencyUs = ceil($durationCorrected / 2) * 1000;
     }
 
     public function setCestWrapper(string $cestWrapper) : void
@@ -672,5 +677,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function getParacetamolModuleName() : string
     {
         return $this->paracetamolModuleName;
+    }
+
+    public function getTickFrequencyUs() : int
+    {
+        return $this->tickFrequencyUs;
     }
 }
