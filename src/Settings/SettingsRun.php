@@ -102,7 +102,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     {
         $this->delayMsec = $milliseconds;
         $this->delaySeconds = $milliseconds / 1000;
-        $this->tickFrequencyUs = $milliseconds * 1000 / 4;
+        $this->tickFrequencyUs = $milliseconds === 0 ? 0 : ceil($milliseconds * 1000 / 4);
     }
 
     public function setCestWrapper(string $cestWrapper) : void
