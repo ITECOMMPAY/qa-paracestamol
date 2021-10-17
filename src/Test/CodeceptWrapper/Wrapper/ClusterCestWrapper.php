@@ -33,7 +33,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
     protected string                 $statusDescription = '';
     protected float                  $expectedDuration = 0.0;
     protected float                  $actualDuration = 0.0;
-    protected bool                   $hasPassedTests = false;
+    protected bool                   $hasPassedTestsThisRun = false;
     protected int                    $previousRunFailedTestsCount = 0;
 
     public function __construct(Log $log, CodeceptWrapperFactory $wrapperFactory, RunnerFactory $runnerFactory, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
@@ -54,7 +54,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
         $this->errorOutput = '';
         $this->statusDescription = '';
         $this->runner = null;
-        $this->hasPassedTests = false;
+        $this->hasPassedTestsThisRun = false;
         $this->previousRunFailedTestsCount = 0;
     }
 
@@ -100,7 +100,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
             return true;
         }
 
-        $this->hasPassedTests = !$this->runner->getPassedTestsDuration()->isEmpty();
+        $this->hasPassedTestsThisRun = !$this->runner->getPassedTestsDuration()->isEmpty();
         $this->failedTests = $this->collectStrings($this->runner->getFailedTests());
         $this->updateActualDuration();
         $this->updateExpectedDuration();
@@ -235,14 +235,14 @@ class ClusterCestWrapper implements ICodeceptWrapper
         return $this->errorOutput;
     }
 
-    public function hasPassedTests() : bool
+    public function hasPassedTestsThisRun() : bool
     {
         if ($this->isFirstRun())
         {
-            return $this->cest->hasPassedTests();
+            return $this->cest->hasPassedTestsThisRun();
         }
 
-        return $this->hasPassedTests;
+        return $this->hasPassedTestsThisRun;
     }
 
     public function getStatusDescription() : string

@@ -16,6 +16,7 @@ not_dividable_rerun_whole:
 not_dividable_rerun_failed:
     - NotDividableUntilRerunCest.php
     - NotDividableUntilRerunFlickingCest.php
+    - NotDividableUntilRerunExplodableCest.php
     - BrokenCest.php
     - TotallyFailingCest.php
     - subfolder

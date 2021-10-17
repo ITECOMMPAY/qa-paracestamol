@@ -246,7 +246,7 @@ class CestWrapper extends AbstractCodeceptWrapper
         return $this->failedTestRecords;
     }
 
-    public function hasPassedTests() : bool
+    public function hasPassedTestsThisRun() : bool
     {
         return !$this->passedTestRecords->isEmpty();
     }

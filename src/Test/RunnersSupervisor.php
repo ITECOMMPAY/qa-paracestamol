@@ -262,8 +262,10 @@ class RunnersSupervisor
 
             if (($test instanceof CestWrapper || $test instanceof ClusterCestWrapper) && $this->settings->isFastCestRerun())
             {
-                if (!$test->hasPassedTests())
+                if (!$test->hasPassedTestsThisRun())
                 {
+                    $this->log->debug($test . ' was excluded from the next rerun because it doesn\'t have any tests passed at the current run');
+
                     $this->failedTestsNoRerun->push($test);
                     continue;
                 }
@@ -301,6 +303,8 @@ class RunnersSupervisor
 
     protected function explodeClusterCest(ClusterCestWrapper $cest) : Queue
     {
+        $this->log->debug($cest . ' was divided into separate tests that will be run in parallel');
+
         $result = new Queue();
 
         $cestCurrentRerunCount = $this->failedTestsRerunCounts->get($cest);
@@ -321,7 +325,7 @@ class RunnersSupervisor
 
     protected function implodeClusterCests() : void
     {
-        if ($this->explodedClusterCests->isEmpty())
+        if (!$this->continuousRerun || $this->explodedClusterCests->isEmpty())
         {
             return;
         }
@@ -337,12 +341,12 @@ class RunnersSupervisor
                 continue;
             }
 
-            $this->failedTests->push($clusterCest);
+            $this->failedTestsNoRerun->push($clusterCest);
         }
 
         $filteredFailedTests = new Queue();
 
-        foreach ($this->failedTests as $failedTest)
+        foreach ($this->failedTestsNoRerun as $failedTest)
         {
             if ($failedTest instanceof TestWrapper && $this->testNamesFromExplodedClusterCests->contains((string) $failedTest))
             {
@@ -352,7 +356,7 @@ class RunnersSupervisor
             $filteredFailedTests->push($failedTest);
         }
 
-        $this->failedTests = $filteredFailedTests;
+        $this->failedTestsNoRerun = $filteredFailedTests;
     }
 
     /**
