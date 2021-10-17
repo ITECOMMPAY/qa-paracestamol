@@ -299,7 +299,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
 
         $percentFailed = (100 * $this->failedTests->count()) / $this->previousRunFailedTestsCount;
 
-        return $percentFailed >= 70;
+        return $percentFailed >= 50;
     }
 
     public function explode() : Queue
