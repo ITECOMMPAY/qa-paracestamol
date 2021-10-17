@@ -34,6 +34,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
     protected float                  $expectedDuration = 0.0;
     protected float                  $actualDuration = 0.0;
     protected bool                   $hasPassedTests = false;
+    protected int                    $previousRunFailedTestsCount = 0;
 
     public function __construct(Log $log, CodeceptWrapperFactory $wrapperFactory, RunnerFactory $runnerFactory, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
     {
@@ -54,11 +55,14 @@ class ClusterCestWrapper implements ICodeceptWrapper
         $this->statusDescription = '';
         $this->runner = null;
         $this->hasPassedTests = false;
+        $this->previousRunFailedTestsCount = 0;
     }
 
     public function start() : void
     {
         $this->reset();
+
+        $this->previousRunFailedTestsCount = $this->failedTests->count();
 
         if ($this->failedTests->isEmpty())
         {
@@ -284,6 +288,45 @@ class ClusterCestWrapper implements ICodeceptWrapper
         }
 
         return ceil($this->actualDuration);
+    }
+
+    public function isExplodable() : bool
+    {
+        if ($this->isFirstRun() || $this->failedTests->isEmpty())
+        {
+            return false;
+        }
+
+        $percentFailed = (100 * $this->failedTests->count()) / $this->previousRunFailedTestsCount;
+
+        return $percentFailed >= 70;
+    }
+
+    public function explode() : Queue
+    {
+        return $this->failedTests->copy();
+    }
+
+    public function implode() : void
+    {
+        $stillFailedTests = new Queue();
+
+        /** @var ICodeceptWrapper $failedTest */
+        foreach ($this->failedTests as $failedTest)
+        {
+            if ($failedTest->isSuccessful())
+            {
+                $this->actualDuration += $failedTest->getActualDuration();
+                $this->expectedDuration -= $failedTest->getActualDuration();
+                $this->expectedDuration = $this->expectedDuration > 0 ? $this->expectedDuration : 1;
+
+                continue;
+            }
+
+            $stillFailedTests->push($failedTest);
+        }
+
+        $this->failedTests = $stillFailedTests;
     }
 
     public function __toString()

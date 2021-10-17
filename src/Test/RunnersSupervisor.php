@@ -6,6 +6,7 @@ namespace Paracetamol\Test;
 
 use Ds\Map;
 use Ds\Queue;
+use Ds\Set;
 use Paracetamol\Helpers\TestNameParts;
 use Paracetamol\Log\Log;
 use Paracetamol\Settings\SettingsRun;
@@ -30,6 +31,9 @@ class RunnersSupervisor
     protected Map           $passedTestsDurations;
     protected Map           $failedTestsRerunCounts;
 
+    protected Queue         $explodedClusterCests;
+    protected Set           $testNamesFromExplodedClusterCests;
+
     protected TestNameParts $skipRerunsForTestNames;
 
     protected bool          $continuousRerun;
@@ -46,6 +50,9 @@ class RunnersSupervisor
         $this->failedTestsNoRerun   = new Queue();
         $this->timedOutTests        = new Queue();
         $this->markedSkippedTests   = new Queue();
+
+        $this->explodedClusterCests = new Queue();
+        $this->testNamesFromExplodedClusterCests = new Set();
 
         $this->passedTestsDurations   = new Map();
         $this->failedTestsRerunCounts = new Map();
@@ -88,6 +95,8 @@ class RunnersSupervisor
 
             usleep($this->settings->getTickFrequencyUs());
         }
+
+        $this->implodeClusterCests();
     }
 
     protected function touchRunner() : void
@@ -258,6 +267,16 @@ class RunnersSupervisor
                     $this->failedTestsNoRerun->push($test);
                     continue;
                 }
+
+                if ($test instanceof ClusterCestWrapper && $test->isExplodable())
+                {
+                    foreach ($this->explodeClusterCest($test) as $testFromCest)
+                    {
+                        $result->push($testFromCest);
+                    }
+
+                    continue;
+                }
             }
 
             $result->push($test);
@@ -278,6 +297,62 @@ class RunnersSupervisor
         $this->failedTestsRerunCounts->put($test, ++$rerunCount);
 
         return $rerunCount === $this->settings->getRerunCount();
+    }
+
+    protected function explodeClusterCest(ClusterCestWrapper $cest) : Queue
+    {
+        $result = new Queue();
+
+        $cestCurrentRerunCount = $this->failedTestsRerunCounts->get($cest);
+
+        foreach ($cest->explode() as $failedTest)
+        {
+            $this->testNamesFromExplodedClusterCests->add((string) $failedTest);
+
+            $this->failedTestsRerunCounts->put($failedTest, $cestCurrentRerunCount);
+
+            $result->push($failedTest);
+        }
+
+        $this->explodedClusterCests->push($cest);
+
+        return $result;
+    }
+
+    protected function implodeClusterCests() : void
+    {
+        if ($this->explodedClusterCests->isEmpty())
+        {
+            return;
+        }
+
+        /** @var ClusterCestWrapper $clusterCest */
+        foreach ($this->explodedClusterCests as $clusterCest)
+        {
+            $clusterCest->implode();
+
+            if ($clusterCest->isSuccessful())
+            {
+                $this->passedTestsDurations->put((string) $clusterCest, $clusterCest->getActualDuration());
+                continue;
+            }
+
+            $this->failedTests->push($clusterCest);
+        }
+
+        $filteredFailedTests = new Queue();
+
+        foreach ($this->failedTests as $failedTest)
+        {
+            if ($failedTest instanceof TestWrapper && $this->testNamesFromExplodedClusterCests->contains((string) $failedTest))
+            {
+                continue;
+            }
+
+            $filteredFailedTests->push($failedTest);
+        }
+
+        $this->failedTests = $filteredFailedTests;
     }
 
     /**
