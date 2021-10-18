@@ -41,6 +41,14 @@ trait CommandParamsToSettingsSaver
             return;
         }
 
+        if (is_array($value) && count($value) === 1)
+        {
+            if ($value[0] === "''" || $value[0] === '""' || $value[0] === '')
+            {
+                $value = [];
+            }
+        }
+
         if (is_string($value))
         {
             $trimmedValue = strtolower(trim($value));

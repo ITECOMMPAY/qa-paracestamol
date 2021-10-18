@@ -478,7 +478,7 @@ class SettingsRun implements ICodeceptionHelperSettings
 
     public function getGroups() : Set
     {
-        return $this->groups;
+        return $this->groups ?? new Set();
     }
 
     public function getDelayMsec() : int
