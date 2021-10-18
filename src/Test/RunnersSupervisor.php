@@ -31,6 +31,8 @@ class RunnersSupervisor
     protected Map           $passedTestsDurations;
     protected Map           $failedTestsRerunCounts;
 
+    protected ?Runner       $mostBurdenedRunner = null;
+
     protected Queue         $explodedClusterCests;
     protected Set           $testNamesFromExplodedClusterCests;
 
@@ -93,6 +95,8 @@ class RunnersSupervisor
                 $this->touchRunner();
             }
 
+            $this->tryTakeSomeBurden();
+
             usleep($this->settings->getTickFrequencyUs());
         }
 
@@ -109,7 +113,7 @@ class RunnersSupervisor
         if ($runner->ticking())
         {
             $this->runners->push($runner);
-            $this->tryTakeSomeBurden($runner);
+            $this->findMostBurdenedRunner($runner);
             return;
         }
 
@@ -128,19 +132,43 @@ class RunnersSupervisor
         }
     }
 
-    /**
-     * If runner has many tests in its queue and there is a free process - move some tests to a new runner
-     *
-     * @param Runner $runner
-     */
-    protected function tryTakeSomeBurden(Runner $runner) : void
+    protected function findMostBurdenedRunner(Runner $runner) : void
     {
         if (!$this->continuousRerun)
         {
             return;
         }
 
-        if ($runner->testsCount() < 2)
+        if (!$runner->hasTestRunning() || $runner->hasEmptyQueue())
+        {
+            return;
+        }
+
+        if ($this->mostBurdenedRunner === null)
+        {
+            $this->mostBurdenedRunner = $runner;
+            return;
+        }
+
+        if ($this->mostBurdenedRunner->testsCount() < $runner->testsCount())
+        {
+            $this->mostBurdenedRunner = $runner;
+        }
+    }
+
+    /**
+     * If runner has many tests in its queue and there is a free process - move some tests to a new runner
+     *
+     * @param Runner $runner
+     */
+    protected function tryTakeSomeBurden() : void
+    {
+        if (!$this->continuousRerun)
+        {
+            return;
+        }
+
+        if ($this->mostBurdenedRunner === null || !$this->mostBurdenedRunner->hasTestRunning() || $this->mostBurdenedRunner->hasEmptyQueue())
         {
             return;
         }
@@ -150,16 +178,17 @@ class RunnersSupervisor
             return;
         }
 
-        $testsToTake = (int) ceil($runner->testsCount() / 2);
+        $testsToTake = (int) ceil($this->mostBurdenedRunner->testsCount() / 2);
         $queue = new Queue();
 
         for ($i = 0; $i < $testsToTake; $i++)
         {
-            $test = $runner->popQueue();
+            $test = $this->mostBurdenedRunner->popQueue();
+
             $queue->push($test);
         }
 
-        $label = $runner->getLabel();
+        $label = $this->mostBurdenedRunner->getLabel();
 
         $this->log->debug("$testsToTake tests moved to new runner, because there is a free process");
 

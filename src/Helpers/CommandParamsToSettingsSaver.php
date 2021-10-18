@@ -43,7 +43,7 @@ trait CommandParamsToSettingsSaver
 
         if (is_array($value) && count($value) === 1)
         {
-            if ($value[0] === "''" || $value[0] === '""' || $value[0] === '')
+            if ($value[0] === "'[]'" || $value[0] === '"[]"' || $value[0] === '[]')
             {
                 $value = [];
             }

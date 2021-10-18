@@ -118,6 +118,11 @@ class Runner
         return $this->label;
     }
 
+    public function hasTestRunning() : bool
+    {
+        return $this->currentTest !== null;
+    }
+
     public function hasEmptyQueue() : bool
     {
         return $this->queue->isEmpty();
