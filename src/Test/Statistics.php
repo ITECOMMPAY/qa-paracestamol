@@ -119,6 +119,8 @@ class Statistics
 
         $processedTests = new Queue();
 
+        $successfullyFetchedDurations = false;
+
         /** @var ICodeceptWrapper $test */
         foreach ($tests as $test)
         {
@@ -126,12 +128,13 @@ class Statistics
             {
                 $duration = $testNameToDuration->get((string) $test);
                 $test->setExpectedDuration($duration);
+                $successfullyFetchedDurations = true;
             }
 
             $processedTests->push($test);
         }
 
-        $this->settings->setSuccessfullyFetchedDurations(true);
+        $this->settings->setSuccessfullyFetchedDurations($successfullyFetchedDurations);
 
         return $processedTests;
     }
