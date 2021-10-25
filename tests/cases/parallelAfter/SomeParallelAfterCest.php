@@ -1,10 +1,10 @@
 <?php
 
 
-namespace ParacetamolTests\cases\parallelAfter;
+namespace ParacestamolTests\cases\parallelAfter;
 
 
-use ParacetamolTests\AcceptanceTester;
+use ParacestamolTests\AcceptanceTester;
 
 class SomeParallelAfterCest
 {

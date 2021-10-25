@@ -1,17 +1,17 @@
 <?php
 
-namespace Paracetamol\Test\CodeceptWrapper\Wrapper;
+namespace Paracestamol\Test\CodeceptWrapper\Wrapper;
 
 
 use Ds\Queue;
 use Ds\Set;
-use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
-use Paracetamol\Helpers\TestNameParts;
-use Paracetamol\Log\Log;
-use Paracetamol\Test\CodeceptWrapper\CodeceptWrapperFactory;
-use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
-use Paracetamol\Test\Runner;
-use Paracetamol\Test\RunnerFactory;
+use Paracestamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracestamol\Helpers\TestNameParts;
+use Paracestamol\Log\Log;
+use Paracestamol\Test\CodeceptWrapper\CodeceptWrapperFactory;
+use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracestamol\Test\Runner;
+use Paracestamol\Test\RunnerFactory;
 
 /**
  * Releases a number of projectile tests on rerun

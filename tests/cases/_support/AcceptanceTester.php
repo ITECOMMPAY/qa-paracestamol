@@ -1,5 +1,5 @@
 <?php
-namespace ParacetamolTests;
+namespace ParacestamolTests;
 
 /**
  * Inherited Methods

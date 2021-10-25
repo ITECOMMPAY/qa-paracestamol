@@ -1,17 +1,17 @@
 <?php
 
 
-namespace Paracetamol\Command;
+namespace Paracestamol\Command;
 
 
 use Codeception\Configuration;
-use Paracetamol\Helpers\CodeceptionProjectParser;
-use Paracetamol\Helpers\CommandParamsToSettingsSaver;
-use Paracetamol\Log\Log;
-use Paracetamol\Module\ParacetamolHelper;
-use Paracetamol\Paracetamol\ParacetamolRun;
-use Paracetamol\Settings\SettingsRun;
-use Paracetamol\Settings\SettingsSerializer;
+use Paracestamol\Helpers\CodeceptionProjectParser;
+use Paracestamol\Helpers\CommandParamsToSettingsSaver;
+use Paracestamol\Log\Log;
+use Paracestamol\Module\ParacestamolHelper;
+use Paracestamol\Paracestamol\ParacestamolRun;
+use Paracestamol\Settings\SettingsRun;
+use Paracestamol\Settings\SettingsSerializer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,16 +28,16 @@ class Run extends Command
     protected Log                $log;
     protected SettingsRun        $settings;
     protected SettingsSerializer $settingsSerializer;
-    protected ParacetamolRun     $paracetamolRun;
+    protected ParacestamolRun     $paracestamolRun;
 
-    public function __construct(Log $log, SettingsRun $settings, SettingsSerializer $settingsSerializer, ParacetamolRun $paracetamolRun)
+    public function __construct(Log $log, SettingsRun $settings, SettingsSerializer $settingsSerializer, ParacestamolRun $paracestamolRun)
     {
         parent::__construct();
 
         $this->log = $log;
         $this->settings = $settings;
         $this->settingsSerializer = $settingsSerializer;
-        $this->paracetamolRun = $paracetamolRun;
+        $this->paracestamolRun = $paracestamolRun;
     }
 
     protected function configure(): void
@@ -67,13 +67,13 @@ class Run extends Command
             // Run stages options
             ->addOption('run_before_series',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in the given order before the main run')
             ->addOption('rerun_whole_series',  null, InputOption::VALUE_REQUIRED, 'If a test from the run_before_series option is failed then rerun all tests from the run_before_series option')
-            ->addOption('serial_before_fails_run',  null, InputOption::VALUE_REQUIRED, 'If run_before_series failed even after all reruns then stop the paracetamol execution')
+            ->addOption('serial_before_fails_run',  null, InputOption::VALUE_REQUIRED, 'If run_before_series failed even after all reruns then stop the paracestamol execution')
             ->addOption('run_before_parallel', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in parallel before the main run')
             ->addOption('run_after_parallel',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in parallel after the main run')
             ->addOption('run_after_series',    null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in the given order after all other test runs')
 
             // Parsing options
-            ->addOption('cache_tests',         null, InputOption::VALUE_REQUIRED, 'Parsing a bunch of big tests can take a long time. Paracetamol can cache a parsing results and use them in the further runs. The caching takes some time too and is not recommended if you don\'t experience the problem with long parsing times')
+            ->addOption('cache_tests',         null, InputOption::VALUE_REQUIRED, 'Parsing a bunch of big tests can take a long time. Paracestamol can cache a parsing results and use them in the further runs. The caching takes some time too and is not recommended if you don\'t experience the problem with long parsing times')
             ->addOption('store_cache_in',      null, InputOption::VALUE_REQUIRED, 'Where to store the parsing cache')
 
             // Filtering options
@@ -91,8 +91,8 @@ class Run extends Command
             ->addOption('project_name',        null, InputOption::VALUE_REQUIRED, 'Used for test duration statistics. By default your test suite namespace is used as your test project name. You can override it using this option')
             ->addOption('bulk_rows_count',     null, InputOption::VALUE_REQUIRED, 'Used for test duration statistics. How many rows get from the statistics database in a single request')
 
-            // Paracetamol options
-            ->addOption('parac_config',        null, InputOption::VALUE_REQUIRED, 'If your paracetamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option', '')
+            // Paracestamol options
+            ->addOption('parac_config',        null, InputOption::VALUE_REQUIRED, 'If your paracestamol.yml is stored in the different directory than your codeception.yml or have a non-default name set the path to it using this option', '')
             ->addOption('no_memory_limit',     null, InputOption::VALUE_REQUIRED, 'Tries to turn off PHP memory_limit (better raise it in your PHP settings instead)')
         ;
     }
@@ -117,7 +117,7 @@ class Run extends Command
             $this->resolveCodeceptionBinPath();
             $this->resolveCodeceptionConfigPath($input);
 
-            $this->loadParacetamolSettings($input);
+            $this->loadParacestamolSettings($input);
             $this->loadCodeceptionConfig($input);
 
             $this->overrideSettings($input, 'project_name');
@@ -153,11 +153,11 @@ class Run extends Command
             $this->resolveProjectName();
             $this->resolveAdaptiveDelay();
             $this->resolveRunOutputPath();
-            $this->resolveParacetamolModule();
+            $this->resolveParacestamolModule();
 
             $this->noMemoryLimit();
 
-            $this->paracetamolRun->execute();
+            $this->paracestamolRun->execute();
         }
         catch (\Throwable $e)
         {
@@ -216,26 +216,26 @@ class Run extends Command
         $this->settings->setRunOutputPath($this->settings->getOutputPath());
     }
 
-    protected function resolveParacetamolModule() : void
+    protected function resolveParacestamolModule() : void
     {
         $enabledModules = $this->settings->getEnabledModules();
 
-        $classWithoutFirstSlash = substr(ParacetamolHelper::class, 0);
+        $classWithoutFirstSlash = substr(ParacestamolHelper::class, 0);
 
-        if (in_array(ParacetamolHelper::class, $enabledModules))
+        if (in_array(ParacestamolHelper::class, $enabledModules))
         {
-            $this->settings->setParacetamolModuleEnabled(true);
+            $this->settings->setParacestamolModuleEnabled(true);
             return;
         }
 
         if (in_array($classWithoutFirstSlash, $enabledModules))
         {
-            $this->settings->setParacetamolModuleName($classWithoutFirstSlash);
+            $this->settings->setParacestamolModuleName($classWithoutFirstSlash);
             return;
         }
     }
 
-    protected function loadParacetamolSettings(InputInterface $input) : void
+    protected function loadParacestamolSettings(InputInterface $input) : void
     {
         $configPath = $input->getOption('parac_config');
 
@@ -250,7 +250,7 @@ class Run extends Command
 
         if (substr_compare($configPath, '.yml', -4) !== 0)
         {
-            $configPath .= DIRECTORY_SEPARATOR . 'paracetamol.yml';
+            $configPath .= DIRECTORY_SEPARATOR . 'paracestamol.yml';
         }
 
         if (!file_exists($configPath))

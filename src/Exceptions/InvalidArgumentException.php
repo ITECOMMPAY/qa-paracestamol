@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Paracetamol\Exceptions;
+namespace Paracestamol\Exceptions;
 
 
-class InvalidArgumentException extends AbstractParacetamolException
+class InvalidArgumentException extends AbstractParacestamolException
 {
 
 }

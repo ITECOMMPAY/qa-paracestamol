@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
 
 use Ds\Queue;
-use Paracetamol\Log\Log;
+use Paracestamol\Log\Log;
 
 class RunnerFactory
 {

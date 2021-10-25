@@ -1,10 +1,10 @@
 <?php
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
-use Paracetamol\Exceptions\LoaderException;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsRun;
+use Paracestamol\Exceptions\LoaderException;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsRun;
 use Symfony\Component\Process\Process;
 
 class ParserWrapper
@@ -96,18 +96,18 @@ class ParserWrapper
         return json_encode($result['data']);
     }
 
-    protected function findParacetamolBinary() : string
+    protected function findParacestamolBinary() : string
     {
-        $path = __DIR__ . '/../../paracetamol';
+        $path = __DIR__ . '/../../paracestamol';
 
         $result = realpath($path);
 
         if ($result === false)
         {
-            throw new LoaderException('Can\'t find the paracetamol binary by the path: ' . $path);
+            throw new LoaderException('Can\'t find the paracestamol binary by the path: ' . $path);
         }
 
-        $this->log->debug('Found the paracetamol binary: ' . $result);
+        $this->log->debug('Found the paracestamol binary: ' . $result);
 
         return $result;
     }
@@ -126,7 +126,7 @@ class ParserWrapper
 
     protected function getParserCmd() : array
     {
-        $paracetamolBin = $this->findParacetamolBinary();
+        $paracestamolBin = $this->findParacestamolBinary();
 
         $suite = $this->settings->getSuite();
 
@@ -163,6 +163,6 @@ class ParserWrapper
             $runOptions []= 'true';
         }
 
-        return ['php', $paracetamolBin, 'parse', $suite, $codeceptionConfigPath, $outputFile, ...$runOptions];
+        return ['php', $paracestamolBin, 'parse', $suite, $codeceptionConfigPath, $outputFile, ...$runOptions];
     }
 }

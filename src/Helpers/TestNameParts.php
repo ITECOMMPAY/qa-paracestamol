@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Paracetamol\Helpers;
+namespace Paracestamol\Helpers;
 
 
 use Ds\Set;

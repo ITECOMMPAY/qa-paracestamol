@@ -1,16 +1,16 @@
 <?php
 
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
 use Ds\Queue;
 use Ds\Set;
-use Paracetamol\Helpers\TestNameParts;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsRun;
-use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
-use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
-use Paracetamol\Test\CodeceptWrapper\CodeceptWrapperFactory;
+use Paracestamol\Helpers\TestNameParts;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsRun;
+use Paracestamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
+use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracestamol\Test\CodeceptWrapper\CodeceptWrapperFactory;
 
 class Loader
 {

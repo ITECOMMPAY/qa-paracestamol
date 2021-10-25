@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
 
-use Paracetamol\Settings\SettingsRun;
+use Paracestamol\Settings\SettingsRun;
 
 class Delayer
 {

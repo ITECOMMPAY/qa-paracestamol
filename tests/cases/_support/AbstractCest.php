@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ParacetamolTests;
+namespace ParacestamolTests;
 
 
 abstract class AbstractCest

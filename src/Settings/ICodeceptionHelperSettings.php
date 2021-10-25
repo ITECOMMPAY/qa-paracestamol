@@ -1,6 +1,6 @@
 <?php
 
-namespace Paracetamol\Settings;
+namespace Paracestamol\Settings;
 
 interface ICodeceptionHelperSettings
 {

@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Paracetamol\Log;
+namespace Paracestamol\Log;
 
 
-use Paracetamol\Exceptions\UsageException;
-use Paracetamol\Settings\SettingsRun;
+use Paracestamol\Exceptions\UsageException;
+use Paracestamol\Settings\SettingsRun;
 use Symfony\Component\Console\Style\OutputStyle;
 
 /**
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\OutputStyle;
  * @method void caution(string $message)
  * @method void newLine(int $count = 1)
  *
- * @package Paracetamol\Log
+ * @package Paracestamol\Log
  */
 class Log
 {

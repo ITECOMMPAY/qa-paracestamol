@@ -1,14 +1,14 @@
 <?php
 
-namespace Paracetamol\Command;
+namespace Paracestamol\Command;
 
-use Paracetamol\Helpers\CodeceptionProjectParser;
-use Paracetamol\Helpers\CommandParamsToSettingsSaver;
-use Paracetamol\Log\Log;
-use Paracetamol\Paracetamol\ParacetamolParse;
-use Paracetamol\Settings\ISettingsSerializer;
-use Paracetamol\Settings\SettingsParse;
-use Paracetamol\Settings\SettingsSerializer;
+use Paracestamol\Helpers\CodeceptionProjectParser;
+use Paracestamol\Helpers\CommandParamsToSettingsSaver;
+use Paracestamol\Log\Log;
+use Paracestamol\Paracestamol\ParacestamolParse;
+use Paracestamol\Settings\ISettingsSerializer;
+use Paracestamol\Settings\SettingsParse;
+use Paracestamol\Settings\SettingsSerializer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,16 +24,16 @@ class Parse extends Command
     protected Log                $log;
     protected SettingsParse      $settings;
     protected SettingsSerializer $settingsSerializer;
-    protected ParacetamolParse   $paracetamolParse;
+    protected ParacestamolParse   $paracestamolParse;
 
-    public function __construct(Log $log, SettingsParse $settings, SettingsSerializer $settingsSerializer, ParacetamolParse $paracetamolParse)
+    public function __construct(Log $log, SettingsParse $settings, SettingsSerializer $settingsSerializer, ParacestamolParse $paracestamolParse)
     {
         parent::__construct();
 
         $this->log = $log;
         $this->settings = $settings;
         $this->settingsSerializer = $settingsSerializer;
-        $this->paracetamolParse = $paracetamolParse;
+        $this->paracestamolParse = $paracestamolParse;
     }
 
     protected function configure(): void
@@ -80,7 +80,7 @@ class Parse extends Command
 
             $this->noMemoryLimit();
 
-            $this->paracetamolParse->execute();
+            $this->paracestamolParse->execute();
         }
         catch (\Throwable $e)
         {

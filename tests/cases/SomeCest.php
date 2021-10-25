@@ -1,11 +1,11 @@
 <?php
 
 
-namespace ParacetamolTests\cases;
+namespace ParacestamolTests\cases;
 
 
-use ParacetamolTests\AbstractCest;
-use ParacetamolTests\AcceptanceTester;
+use ParacestamolTests\AbstractCest;
+use ParacestamolTests\AcceptanceTester;
 
 class SomeCest extends AbstractCest
 {

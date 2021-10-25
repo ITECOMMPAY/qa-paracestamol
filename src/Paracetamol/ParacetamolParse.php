@@ -1,13 +1,13 @@
 <?php
 
-namespace Paracetamol\Paracetamol;
+namespace Paracestamol\Paracestamol;
 
-use Paracetamol\Exceptions\ParserException;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsParse;
-use Paracetamol\Test\Parser;
+use Paracestamol\Exceptions\ParserException;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsParse;
+use Paracestamol\Test\Parser;
 
-class ParacetamolParse
+class ParacestamolParse
 {
     protected Log           $log;
     protected SettingsParse $settings;

@@ -1,7 +1,7 @@
 <?php
 
-use Paracetamol\Command\Parse;
-use Paracetamol\Command\Run;
+use Paracestamol\Command\Parse;
+use Paracestamol\Command\Run;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 

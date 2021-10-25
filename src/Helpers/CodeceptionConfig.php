@@ -1,6 +1,6 @@
 <?php
 
-namespace Paracetamol\Helpers;
+namespace Paracestamol\Helpers;
 
 use Codeception\Exception\ConfigurationException;
 use Codeception\Lib\ParamsLoader;

@@ -1,19 +1,19 @@
 <?php
 
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
 
 use Ds\Map;
 use Ds\Queue;
 use Ds\Set;
-use Paracetamol\Helpers\TestNameParts;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsRun;
-use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
-use Paracetamol\Test\CodeceptWrapper\Wrapper\CestWrapper;
-use Paracetamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper;
-use Paracetamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
+use Paracestamol\Helpers\TestNameParts;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsRun;
+use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\CestWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
 
 class RunnersSupervisor
 {

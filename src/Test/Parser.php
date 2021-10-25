@@ -1,10 +1,10 @@
 <?php
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
 use Codeception\Util\Autoload;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsParse;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsParse;
 use PHPUnit\Framework\TestSuite;
 use Symfony\Component\Finder\Finder;
 

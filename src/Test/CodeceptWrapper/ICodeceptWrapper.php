@@ -1,9 +1,9 @@
 <?php
 
-namespace Paracetamol\Test\CodeceptWrapper;
+namespace Paracestamol\Test\CodeceptWrapper;
 
 use Ds\Hashable;
-use Paracetamol\Helpers\TestNameParts;
+use Paracestamol\Helpers\TestNameParts;
 
 interface ICodeceptWrapper extends Hashable
 {

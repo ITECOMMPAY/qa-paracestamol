@@ -6,7 +6,7 @@ $dbname   = 'postgres';
 $user     = 'postgres';
 $password = 'postgres';
 
-$schema   = 'paracetamol';
+$schema   = 'paracestamol';
 $interval = '3 month'; // Older records will be disregarded in the median test duration calculation
 
 $pdo = new \PDO("pgsql:host={$host};port={$port};dbname={$dbname}", $user, $password);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Paracetamol\Settings;
+namespace Paracestamol\Settings;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Serializer;

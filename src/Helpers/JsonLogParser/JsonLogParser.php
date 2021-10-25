@@ -1,9 +1,9 @@
 <?php
 
-namespace Paracetamol\Helpers\JsonLogParser;
+namespace Paracestamol\Helpers\JsonLogParser;
 
 use Ds\Map;
-use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracestamol\Helpers\JsonLogParser\Records\TestRecord;
 
 class JsonLogParser
 {

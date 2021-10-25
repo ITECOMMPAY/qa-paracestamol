@@ -1,5 +1,5 @@
 # suite config
-namespace: ParacetamolTests
+namespace: ParacestamolTests
 
 suites:
     acceptance:
@@ -7,7 +7,7 @@ suites:
         path: .
         modules:
             enabled:
-                - Paracetamol\Module\ParacetamolHelper
+                - Paracestamol\Module\ParacestamolHelper
                 
 extensions:
 

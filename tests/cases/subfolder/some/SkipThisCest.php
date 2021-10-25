@@ -1,8 +1,8 @@
 <?php
 
-namespace ParacetamolTests\cases\subfolder\some;
+namespace ParacestamolTests\cases\subfolder\some;
 
-use ParacetamolTests\AcceptanceTester;
+use ParacestamolTests\AcceptanceTester;
 
 class SkipThisCest
 {

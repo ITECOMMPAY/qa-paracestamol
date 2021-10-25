@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
 
 use Ds\Map;
 use Ds\Queue;
-use Paracetamol\Log\Log;
-use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracestamol\Log\Log;
+use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
 
 class Runner
 {

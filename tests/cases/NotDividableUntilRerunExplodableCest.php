@@ -1,8 +1,8 @@
 <?php
 
-namespace ParacetamolTests\cases;
+namespace ParacestamolTests\cases;
 
-use ParacetamolTests\AcceptanceTester;
+use ParacestamolTests\AcceptanceTester;
 
 class NotDividableUntilRerunExplodableCest
 {
@@ -23,7 +23,7 @@ class NotDividableUntilRerunExplodableCest
      */
     public function test02(AcceptanceTester $I)
     {
-        $token = '/tmp/paracetamol_test_token';
+        $token = '/tmp/paracestamol_test_token';
         $firstRun = !file_exists($token);
 
         if ($firstRun)

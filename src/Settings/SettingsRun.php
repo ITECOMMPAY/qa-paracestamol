@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Paracetamol\Settings;
+namespace Paracestamol\Settings;
 
 use Ds\Set;
-use Paracetamol\Exceptions\UsageException;
-use Paracetamol\Module\ParacetamolHelper;
+use Paracestamol\Exceptions\UsageException;
+use Paracestamol\Module\ParacestamolHelper;
 
 class SettingsRun implements ICodeceptionHelperSettings
 {
@@ -70,8 +70,8 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected ?int      $minTestDurationSec           = null;
     protected ?int      $maxTestDurationSec           = null;
     protected ?int      $medianTestDurationSec        = null;
-    protected bool      $paracetamolModuleEnabled     = false;
-    protected string    $paracetamolModuleName        = ParacetamolHelper::class;
+    protected bool      $paracestamolModuleEnabled     = false;
+    protected string    $paracestamolModuleName        = ParacestamolHelper::class;
 
     public function getEnvAsString() : string
     {
@@ -342,9 +342,9 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->fastCestRerun = $fastCestRerun;
     }
 
-    public function setParacetamolModuleEnabled(bool $paracetamolModuleEnabled) : void
+    public function setParacestamolModuleEnabled(bool $paracestamolModuleEnabled) : void
     {
-        $this->paracetamolModuleEnabled = $paracetamolModuleEnabled;
+        $this->paracestamolModuleEnabled = $paracestamolModuleEnabled;
     }
 
     public function setSuiteConfig(array $suiteConfig) : void
@@ -357,9 +357,9 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->enabledModules = $enabledModules;
     }
 
-    public function setParacetamolModuleName(string $paracetamolModuleName) : void
+    public function setParacestamolModuleName(string $paracestamolModuleName) : void
     {
-        $this->paracetamolModuleName = $paracetamolModuleName;
+        $this->paracestamolModuleName = $paracestamolModuleName;
     }
 
 
@@ -656,9 +656,9 @@ class SettingsRun implements ICodeceptionHelperSettings
         return $this->fastCestRerun;
     }
 
-    public function isParacetamolModuleEnabled() : bool
+    public function isParacestamolModuleEnabled() : bool
     {
-        return $this->paracetamolModuleEnabled;
+        return $this->paracestamolModuleEnabled;
     }
 
     public function getSuiteConfig() : array
@@ -671,9 +671,9 @@ class SettingsRun implements ICodeceptionHelperSettings
         return $this->enabledModules;
     }
 
-    public function getParacetamolModuleName() : string
+    public function getParacestamolModuleName() : string
     {
-        return $this->paracetamolModuleName;
+        return $this->paracestamolModuleName;
     }
 
     public function getTickFrequencyUs() : int

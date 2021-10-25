@@ -1,8 +1,8 @@
 <?php
 
-namespace Paracetamol\Exceptions;
+namespace Paracestamol\Exceptions;
 
-class GeneralException extends AbstractParacetamolException
+class GeneralException extends AbstractParacestamolException
 {
 
 }

@@ -1,30 +1,30 @@
 <?php
 
 
-namespace Paracetamol\Paracetamol;
+namespace Paracestamol\Paracestamol;
 
 
 use Codeception\Util\Autoload;
 use DateInterval;
 use Ds\Map;
 use Ds\Queue;
-use Paracetamol\Exceptions\GeneralException;
-use Paracetamol\Exceptions\SerialBeforeFailedException;
-use Paracetamol\Helpers\TestNameParts;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsRun;
-use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
-use Paracetamol\Test\Delayer;
-use Paracetamol\Test\Partitioner;
-use Paracetamol\Test\Loader;
-use Paracetamol\Test\RunnersSupervisor;
-use Paracetamol\Test\RunnersSupervisorFactory;
-use Paracetamol\Test\Statistics;
-use Paracetamol\Test\CodeceptWrapper\ICodeceptWrapper;
-use Paracetamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
+use Paracestamol\Exceptions\GeneralException;
+use Paracestamol\Exceptions\SerialBeforeFailedException;
+use Paracestamol\Helpers\TestNameParts;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsRun;
+use Paracestamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
+use Paracestamol\Test\Delayer;
+use Paracestamol\Test\Partitioner;
+use Paracestamol\Test\Loader;
+use Paracestamol\Test\RunnersSupervisor;
+use Paracestamol\Test\RunnersSupervisorFactory;
+use Paracestamol\Test\Statistics;
+use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
 use Symfony\Component\Process\Process;
 
-class ParacetamolRun
+class ParacestamolRun
 {
     protected SettingsRun              $settings;
     protected Log                      $log;

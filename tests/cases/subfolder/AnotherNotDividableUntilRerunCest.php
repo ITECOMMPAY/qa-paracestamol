@@ -1,8 +1,8 @@
 <?php
 
-namespace ParacetamolTests\cases\subfolder;
+namespace ParacestamolTests\cases\subfolder;
 
-use ParacetamolTests\AcceptanceTester;
+use ParacestamolTests\AcceptanceTester;
 
 class AnotherNotDividableUntilRerunCest
 {

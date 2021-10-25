@@ -1,12 +1,12 @@
 {
-    "name": "itecommpay/qa-paracetamol",
+    "name": "itecommpay/qa-paracestamol",
     "description": "Parallel test runner for Codeception framework",
     "keywords": [
         "codeception",
         "parallel",
         "process"
     ],
-    "homepage": "https://github.com/ITECOMMPAY/qa-paracetamol/",
+    "homepage": "https://github.com/ITECOMMPAY/qa-paracestamol/",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -36,8 +36,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Paracetamol\\": "src",
-            "ParacetamolTests\\": "tests"
+            "Paracestamol\\": "src",
+            "ParacestamolTests\\": "tests"
         }
     },
     "config": {
@@ -46,5 +46,5 @@
         },
         "sort-packages": true
     },
-    "bin": ["paracetamol"]
+    "bin": ["paracestamol"]
 }

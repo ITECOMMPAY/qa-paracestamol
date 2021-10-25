@@ -1,8 +1,8 @@
 <?php
 
-namespace Paracetamol\Exceptions;
+namespace Paracestamol\Exceptions;
 
-class LoaderException extends AbstractParacetamolException
+class LoaderException extends AbstractParacestamolException
 {
 
 }

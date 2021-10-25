@@ -1,6 +1,6 @@
 <?php
 
-namespace Paracetamol\Helpers\JsonLogParser;
+namespace Paracestamol\Helpers\JsonLogParser;
 
 class JsonLogParserFactory
 {

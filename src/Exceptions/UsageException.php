@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Paracetamol\Exceptions;
+namespace Paracestamol\Exceptions;
 
 
-class UsageException extends AbstractParacetamolException
+class UsageException extends AbstractParacestamolException
 {
 
 }

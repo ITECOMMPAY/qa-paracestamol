@@ -1,6 +1,6 @@
 <?php
 
-namespace Paracetamol\Settings;
+namespace Paracestamol\Settings;
 
 class SettingsParse implements ICodeceptionHelperSettings
 {

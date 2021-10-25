@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Paracetamol\Test;
+namespace Paracestamol\Test;
 
 
 use Ds\Queue;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsRun;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsRun;
 
 class RunnersSupervisorFactory
 {

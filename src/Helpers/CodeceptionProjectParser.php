@@ -1,12 +1,12 @@
 <?php
 
-namespace Paracetamol\Helpers;
+namespace Paracestamol\Helpers;
 
 use Codeception\Util\PathResolver;
-use Paracetamol\Exceptions\GeneralException;
-use Paracetamol\Exceptions\InvalidArgumentException;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\ICodeceptionHelperSettings;
+use Paracestamol\Exceptions\GeneralException;
+use Paracestamol\Exceptions\InvalidArgumentException;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\ICodeceptionHelperSettings;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;

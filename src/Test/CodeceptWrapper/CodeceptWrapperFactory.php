@@ -1,18 +1,18 @@
 <?php
 
 
-namespace Paracetamol\Test\CodeceptWrapper;
+namespace Paracestamol\Test\CodeceptWrapper;
 
 
 use Ds\Set;
-use Paracetamol\Helpers\JsonLogParser\JsonLogParserFactory;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsRun;
-use Paracetamol\Test\CodeceptWrapper\Wrapper\CestWrapper;
-use Paracetamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper;
-use Paracetamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
-use Paracetamol\Test\Delayer;
-use Paracetamol\Test\RunnerFactory;
+use Paracestamol\Helpers\JsonLogParser\JsonLogParserFactory;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsRun;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\CestWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
+use Paracestamol\Test\Delayer;
+use Paracestamol\Test\RunnerFactory;
 
 class CodeceptWrapperFactory
 {

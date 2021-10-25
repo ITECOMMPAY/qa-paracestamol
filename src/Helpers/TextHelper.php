@@ -1,6 +1,6 @@
 <?php
 
-namespace Paracetamol\Helpers;
+namespace Paracestamol\Helpers;
 
 class TextHelper
 {

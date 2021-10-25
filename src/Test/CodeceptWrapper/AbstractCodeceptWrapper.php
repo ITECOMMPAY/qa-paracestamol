@@ -1,12 +1,12 @@
 <?php
 
-namespace Paracetamol\Test\CodeceptWrapper;
+namespace Paracestamol\Test\CodeceptWrapper;
 
-use Paracetamol\Helpers\JsonLogParser\JsonLogParser;
-use Paracetamol\Helpers\JsonLogParser\JsonLogParserFactory;
-use Paracetamol\Helpers\TestNameParts;
-use Paracetamol\Log\Log;
-use Paracetamol\Settings\SettingsRun;
+use Paracestamol\Helpers\JsonLogParser\JsonLogParser;
+use Paracestamol\Helpers\JsonLogParser\JsonLogParserFactory;
+use Paracestamol\Helpers\TestNameParts;
+use Paracestamol\Log\Log;
+use Paracestamol\Settings\SettingsRun;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 

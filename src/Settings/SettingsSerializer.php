@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Paracetamol\Settings;
+namespace Paracestamol\Settings;
 
 
 use Doctrine\Common\Annotations\AnnotationReader;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Paracetamol\Test\CodeceptWrapper\Wrapper;
+namespace Paracestamol\Test\CodeceptWrapper\Wrapper;
 
-use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
-use Paracetamol\Helpers\TextHelper;
-use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
+use Paracestamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracestamol\Helpers\TextHelper;
+use Paracestamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
 
 class TestWrapper extends AbstractCodeceptWrapper
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Paracetamol\Helpers;
+namespace Paracestamol\Helpers;
 
-use Paracetamol\Settings\ICodeceptionHelperSettings;
-use Paracetamol\Settings\ISettingsSerializer;
+use Paracestamol\Settings\ICodeceptionHelperSettings;
+use Paracestamol\Settings\ISettingsSerializer;
 use Symfony\Component\Console\Input\InputInterface;
 
 trait CommandParamsToSettingsSaver

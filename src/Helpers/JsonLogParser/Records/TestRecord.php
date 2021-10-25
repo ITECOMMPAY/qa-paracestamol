@@ -1,9 +1,9 @@
 <?php
 
-namespace Paracetamol\Helpers\JsonLogParser\Records;
+namespace Paracestamol\Helpers\JsonLogParser\Records;
 
 use Ds\Hashable;
-use Paracetamol\Helpers\TextHelper;
+use Paracestamol\Helpers\TextHelper;
 
 class TestRecord implements Hashable
 {

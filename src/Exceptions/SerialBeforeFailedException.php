@@ -1,8 +1,8 @@
 <?php
 
-namespace Paracetamol\Exceptions;
+namespace Paracestamol\Exceptions;
 
-class SerialBeforeFailedException extends AbstractParacetamolException
+class SerialBeforeFailedException extends AbstractParacestamolException
 {
 
 }

@@ -1,17 +1,17 @@
 <?php
 
-namespace Paracetamol\Test\CodeceptWrapper\Wrapper;
+namespace Paracestamol\Test\CodeceptWrapper\Wrapper;
 
 use Ds\Set;
 use Ds\Vector;
-use Paracetamol\Helpers\JsonLogParser\JsonLogParserFactory;
-use Paracetamol\Helpers\JsonLogParser\Records\TestRecord;
-use Paracetamol\Helpers\TextHelper;
-use Paracetamol\Log\Log;
-use Paracetamol\Module\ParacetamolHelper;
-use Paracetamol\Settings\SettingsRun;
-use Paracetamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
-use Paracetamol\Test\Delayer;
+use Paracestamol\Helpers\JsonLogParser\JsonLogParserFactory;
+use Paracestamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracestamol\Helpers\TextHelper;
+use Paracestamol\Log\Log;
+use Paracestamol\Module\ParacestamolHelper;
+use Paracestamol\Settings\SettingsRun;
+use Paracestamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
+use Paracestamol\Test\Delayer;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
 
@@ -89,10 +89,10 @@ class CestWrapper extends AbstractCodeceptWrapper
             $runOptions []= $this->settings->getEnvAsString();
         }
 
-        if ($this->settings->isParacetamolModuleEnabled())
+        if ($this->settings->isParacestamolModuleEnabled())
         {
             $runOptions []= '-o';
-            $runOptions []= 'modules: config: ' . $this->settings->getParacetamolModuleName() . ': pause_before_test: true';
+            $runOptions []= 'modules: config: ' . $this->settings->getParacestamolModuleName() . ': pause_before_test: true';
         }
 
         if (!empty($this->settings->getOverride()))
@@ -106,7 +106,7 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     protected function configureProcess(Process $proc) : void
     {
-        if (!$this->settings->isParacetamolModuleEnabled())
+        if (!$this->settings->isParacestamolModuleEnabled())
         {
             return;
         }
@@ -134,7 +134,7 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     protected function allowTestStart() : void
     {
-        if (!$this->settings->isParacetamolModuleEnabled())
+        if (!$this->settings->isParacestamolModuleEnabled())
         {
             return;
         }
@@ -146,9 +146,9 @@ class CestWrapper extends AbstractCodeceptWrapper
 
         if (!$this->waitsUntilTestStartAllowed)
         {
-            $prompt = mb_substr($this->getIncrementalOutput(), -strlen(ParacetamolHelper::ALLOW_TEST_START_PROMPT));
+            $prompt = mb_substr($this->getIncrementalOutput(), -strlen(ParacestamolHelper::ALLOW_TEST_START_PROMPT));
 
-            if ($prompt !== ParacetamolHelper::ALLOW_TEST_START_PROMPT)
+            if ($prompt !== ParacestamolHelper::ALLOW_TEST_START_PROMPT)
             {
                 return;
             }

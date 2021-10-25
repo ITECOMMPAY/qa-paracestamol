@@ -1,13 +1,13 @@
 <?php
 
-namespace Paracetamol\Module;
+namespace Paracestamol\Module;
 
 use Codeception\Module as CodeceptionModule;
 use Codeception\TestInterface;
 
-class ParacetamolHelper extends CodeceptionModule
+class ParacestamolHelper extends CodeceptionModule
 {
-    public const ALLOW_TEST_START_PROMPT = 'Paracetamol allows start? [Y]';
+    public const ALLOW_TEST_START_PROMPT = 'Paracestamol allows start? [Y]';
 
     protected $config = [
         'pause_before_test' => false
