@@ -87,6 +87,13 @@ class Loader
 
     protected function markOnlyTestsAsDividable() : void
     {
+        if ($this->settings->getCestWrapper() === 'tests' || $this->onlyTests->getTests()->isEmpty())
+        {
+            return;
+        }
+
+        $this->log->veryVerbose('Some cests will be divided into separate tests because these tests are mentioned in \'only_tests\' setting');
+
         foreach ($this->onlyTests->getTests() as $testName)
         {
             $end = strpos($testName, '.php:') + 4;
