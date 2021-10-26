@@ -68,6 +68,7 @@ class Loader
         {
             $this->log->veryVerbose('Only tests that are mentioned in \'only_tests\' setting will be loaded');
             $this->onlyTests = new TestNameParts($this->settings->getOnlyTests());
+            $this->markOnlyTestsAsDividable();
         }
 
         if (!empty($this->settings->getSkipTests()))
@@ -82,6 +83,16 @@ class Loader
         }
 
         return $this->parseTests();
+    }
+
+    protected function markOnlyTestsAsDividable() : void
+    {
+        foreach ($this->onlyTests->getTests() as $testName)
+        {
+            $end = strpos($testName, '.php:') + 4;
+            $cestName = substr($testName, 0, $end);
+            $this->dividableCests->getCests()->add($cestName);
+        }
     }
 
     protected function parseTests() : Queue

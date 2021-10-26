@@ -1,6 +1,0 @@
-#!/usr/bin/env php
-<?php
-
-/** CLI */
-
-require __DIR__ . '/main.php';
