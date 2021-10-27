@@ -21,6 +21,7 @@ class Loader
 
     protected TestNameParts $onlyTests;
     protected TestNameParts $skipTests;
+    protected TestNameParts $immuneTests;
     protected TestNameParts $dividableCests;
     protected TestNameParts $notDividableCestsWhole;
     protected TestNameParts $notDividableCestsOnlyFailed;
@@ -34,6 +35,7 @@ class Loader
 
         $this->onlyTests = new TestNameParts([]);
         $this->skipTests = new TestNameParts([]);
+        $this->immuneTests = new TestNameParts([]);
         $this->dividableCests = new TestNameParts([]);
         $this->notDividableCestsWhole = new TestNameParts([]);
         $this->notDividableCestsOnlyFailed = new TestNameParts([]);
@@ -68,7 +70,7 @@ class Loader
         {
             $this->log->veryVerbose('Only tests that are mentioned in \'only_tests\' setting will be loaded');
             $this->onlyTests = new TestNameParts($this->settings->getOnlyTests());
-            $this->markOnlyTestsAsDividable();
+            $this->markCestsAsDividable($this->onlyTests);
         }
 
         if (!empty($this->settings->getSkipTests()))
@@ -82,19 +84,26 @@ class Loader
             $this->log->veryVerbose('Look only for tests with groups: ' . json_encode($this->settings->getGroups()->toArray()));
         }
 
+        if (!empty($this->settings->getImmuneTests()))
+        {
+            $this->log->veryVerbose('Some tests will ignore selected groups, \'skip_tests\' and \'only_tests\' settings (as per \'immune_tests\' setting).');
+            $this->immuneTests = new TestNameParts($this->settings->getImmuneTests());
+            $this->markCestsAsDividable($this->immuneTests);
+        }
+
         return $this->parseTests();
     }
 
-    protected function markOnlyTestsAsDividable() : void
+    protected function markCestsAsDividable(TestNameParts $nameParts) : void
     {
-        if ($this->settings->getCestWrapper() === 'tests' || $this->onlyTests->getTests()->isEmpty())
+        if ($this->settings->getCestWrapper() === 'tests' || $nameParts->getTests()->isEmpty())
         {
             return;
         }
 
-        $this->log->veryVerbose('Some cests will be divided into separate tests because these tests are mentioned in \'only_tests\' setting');
+        $this->log->veryVerbose('Some cests will be divided into separate tests because these tests are mentioned in \'only_tests\' or \'immune_tests\' setting');
 
-        foreach ($this->onlyTests->getTests() as $testName)
+        foreach ($nameParts->getTests() as $testName)
         {
             $end = strpos($testName, '.php:') + 4;
             $cestName = substr($testName, 0, $end);
@@ -117,6 +126,8 @@ class Loader
         return $this->filterByOnlyTests($tests);
     }
 
+    //TODO decouple test wrapping from filtering
+
     protected function loadCests(array $cests) : Queue
     {
         $result = new Queue();
@@ -125,7 +136,8 @@ class Loader
         {
             $path = dirname($cestName);
 
-            if ($this->skipTests->matchesCest($cestName) || $this->skipTests->matchesPath($path))
+            if (($this->skipTests->matchesCest($cestName) || $this->skipTests->matchesPath($path))
+                && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName)))
             {
                 $this->log->debug($cestName . ' -> skipped (in skip_tests)');
                 continue;
@@ -169,36 +181,36 @@ class Loader
         {
             if ($this->dividableCests->matchesCest($cestName) || $this->dividableCests->matchesPath($path))
             {
-                $this->wrapTests($result, $cestName, $methods, $cestGroups, $expectedGroups);
+                $this->wrapTests($result, $path, $cestName, $methods, $cestGroups, $expectedGroups);
 
                 continue;
             }
 
             if ($this->notDividableCestsWhole->matchesCest($cestName) || $this->notDividableCestsWhole->matchesPath($path))
             {
-                $this->wrapWholeCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
+                $this->wrapWholeCest($result, $path, $cestName, $methods, $cestGroups, $expectedGroups);
 
                 continue;
             }
 
             if ($this->notDividableCestsOnlyFailed->matchesCest($cestName) || $this->notDividableCestsOnlyFailed->matchesPath($path))
             {
-                $this->wrapClusterCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
+                $this->wrapClusterCest($result, $path, $cestName, $methods, $cestGroups, $expectedGroups);
 
                 continue;
             }
 
             if ($this->settings->getCestWrapper() === 'tests')
             {
-                $this->wrapTests($result, $cestName, $methods, $cestGroups, $expectedGroups);
+                $this->wrapTests($result, $path, $cestName, $methods, $cestGroups, $expectedGroups);
             }
             elseif ($this->settings->getCestWrapper() === 'cest_rerun_whole')
             {
-                $this->wrapWholeCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
+                $this->wrapWholeCest($result, $path, $cestName, $methods, $cestGroups, $expectedGroups);
             }
             else
             {
-                $this->wrapClusterCest($result, $cestName, $methods, $cestGroups, $expectedGroups);
+                $this->wrapClusterCest($result, $path, $cestName, $methods, $cestGroups, $expectedGroups);
             }
         }
 
@@ -210,27 +222,29 @@ class Loader
         return !$expectedGroups->isEmpty() && $actualGroups->intersect($expectedGroups)->isEmpty();
     }
 
-    protected function wrapTests(Queue $queue, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
+    protected function wrapTests(Queue $queue, string $path, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
     {
         foreach ($methods as $methodName => $testData)
         {
             $actualGroups = $cestGroups->union(new Set($testData['groups'] ?? []));
 
-            $this->wrapTest($queue, $cestName, $methodName, $actualGroups, $expectedGroups);
+            $this->wrapTest($queue, $path, $cestName, $methodName, $actualGroups, $expectedGroups);
         }
     }
 
-    protected function wrapTest(Queue $queue, string $cestName, string $methodName, Set $actualGroups, Set $expectedGroups) : void
+    protected function wrapTest(Queue $queue, string $path, string $cestName, string $methodName, Set $actualGroups, Set $expectedGroups) : void
     {
         $testName = "$cestName:$methodName";
 
-        if ($this->skipTests->matchesTest($testName))
+        if ($this->skipTests->matchesTest($testName)
+            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName) || $this->immuneTests->matchesTest($testName)))
         {
             $this->log->debug($testName . ' -> skipped (in skip_tests)');
             return;
         }
 
-        if ($this->notInExpectedGroups($actualGroups, $expectedGroups))
+        if ($this->notInExpectedGroups($actualGroups, $expectedGroups)
+            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName) || $this->immuneTests->matchesTest($testName)))
         {
             $this->log->debug($testName . ' -> skipped (not in a group)');
             return;
@@ -241,11 +255,12 @@ class Loader
         $queue->push($test);
     }
 
-    protected function wrapWholeCest(Queue $queue, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
+    protected function wrapWholeCest(Queue $queue, string $path, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
     {
         $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
 
-        if ($this->notInExpectedGroups($actualGroups, $expectedGroups))
+        if ($this->notInExpectedGroups($actualGroups, $expectedGroups)
+            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName)))
         {
             $this->log->debug($cestName . ' -> skipped (not in a group)');
             return;
@@ -256,11 +271,12 @@ class Loader
         $queue->push($test);
     }
 
-    protected function wrapClusterCest(Queue $queue, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
+    protected function wrapClusterCest(Queue $queue, string $path, string $cestName, array $methods, Set $cestGroups, Set $expectedGroups) : void
     {
         $actualGroups = $cestGroups->union($this->collectMethodGroups($methods));
 
-        if ($this->notInExpectedGroups($actualGroups, $expectedGroups))
+        if ($this->notInExpectedGroups($actualGroups, $expectedGroups)
+            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName)))
         {
             $this->log->debug($cestName . ' -> skipped (not in a group)');
             return;
@@ -296,7 +312,7 @@ class Loader
         /** @var AbstractCodeceptWrapper $test */
         foreach ($tests as $test)
         {
-            if ($test->matches($this->onlyTests))
+            if ($test->matches($this->onlyTests) || $test->matches($this->immuneTests))
             {
                 $result->push($test);
             }

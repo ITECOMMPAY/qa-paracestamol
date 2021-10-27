@@ -29,6 +29,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected int       $idleTimeoutSec          =  -1;
     protected array     $onlyTests               =  [];
     protected array     $skipTests               =  [];
+    protected array     $immuneTests             =  [];
     protected array     $skipReruns              =  [];
     protected array     $runBeforeSeries         =  [];
     protected array     $runBeforeParallel       =  [];
@@ -362,6 +363,13 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->paracestamolModuleName = $paracestamolModuleName;
     }
 
+    public function setImmuneTests(array $immuneTests) : void
+    {
+        $this->immuneTests = $immuneTests;
+    }
+
+
+
 
 
 
@@ -679,5 +687,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function getTickFrequencyUs() : int
     {
         return $this->tickFrequencyUs;
+    }
+
+    public function getImmuneTests() : array
+    {
+        return $this->immuneTests;
     }
 }

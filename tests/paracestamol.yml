@@ -29,8 +29,7 @@ skip_reruns:
     - SomeOtherCest.php:test02
 
 run_before_series:
-    - SomeBeforeAfterCest.php:before02
-    - SomeBeforeAfterCest.php:before01
+    - SomeBeforeCest.php
 
 run_before_parallel:
     - SomeParallelBeforeCest.php
@@ -39,5 +38,8 @@ run_after_parallel:
     - parallelAfter
 
 run_after_series:
-    - SomeBeforeAfterCest.php:after01
-    - SomeBeforeAfterCest.php:after02
+    - SomeAfterCest.php
+
+immune_tests:
+    - SomeBeforeCest.php
+    - SomeAfterCest.php

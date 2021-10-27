@@ -202,6 +202,11 @@ class ParacestamolRun
             }
         };
 
+        if ($this->settings->isAdaptiveDelay())
+        {
+            $this->settings->setDelayMsec(1000);
+        }
+
         for ($i = 0; $i < $runCount; $i++)
         {
             if ($tests->isEmpty())

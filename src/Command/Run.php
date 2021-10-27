@@ -80,6 +80,7 @@ class Run extends Command
             ->addOption('groups',               'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run only tests marked with the given groups')
             ->addOption('only_tests',          null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run only these tests')
             ->addOption('skip_tests',          null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Skip these tests')
+            ->addOption('immune_tests',        null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These tests ignore selected groups, skip_tests and only_tests settings')
 
             // Environment options
             ->addOption('env',                 null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, "Run tests in the selected environment. Note that all env arguments are treated as one environment, the same way if it was merged with ','. Also note that the order in which the environment files are given is NOT preserved when they are given using separate arguments.")
@@ -134,6 +135,7 @@ class Run extends Command
             $this->overrideSettings($input, 'idle_timeout_sec');
             $this->overrideSettings($input, 'only_tests');
             $this->overrideSettings($input, 'skip_tests');
+            $this->overrideSettings($input, 'immune_tests');
             $this->overrideSettings($input, 'skip_reruns');
             $this->overrideSettings($input, 'run_before_series');
             $this->overrideSettings($input, 'run_before_parallel');

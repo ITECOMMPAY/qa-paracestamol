@@ -87,12 +87,12 @@ fast_cest_rerun | --fast_cest_rerun false | If all tests selected for the curren
 
 Option | Example | Description
 --- | --- | --- 
-run_before_series | --run_before_series SomeBeforeAfterCest.php:before01 | Run these tests in the given order before the main run
+run_before_series | --run_before_series SomeBeforeCest.php:before01 | Run these tests in the given order before the main run
 rerun_whole_series | --rerun_whole_series true | If a test from the run_before_series option is failed then rerun all tests from the run_before_series option
 serial_before_fails_run | --serial_before_fails_run true | If run_before_series failed even after all reruns then stop the paracestamol execution
 run_before_parallel | --run_before_parallel SomeParallelBeforeCest.php | Run these tests in parallel before the main run
 run_after_parallel | --run_after_parallel parallelAfter | Run these tests in parallel after the main run
-run_after_series | --run_after_series SomeBeforeAfterCest.php:after01 | Run these tests in the given order after all other test runs
+run_after_series | --run_after_series SomeAfterCest.php:after01 | Run these tests in the given order after all other test runs
 
 ### Parsing
 
@@ -108,6 +108,7 @@ Option | Example | Description
 groups, g | -g cat -g dog | Run only tests marked with the given groups
 only_tests | --only_tests parallelAfter/SomeParallelAfterCest.php | Run only these tests (see the "Setting test names" section)
 skip_tests | --skip_tests SomeCest.php:test02 | Skip these tests
+immune_tests | --immune_tests SomeCest.php:test01 | These tests ignore selected groups, skip_tests and only_tests settings
 
 ### Environment
 
