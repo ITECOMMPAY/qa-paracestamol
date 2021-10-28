@@ -360,7 +360,7 @@ HEREDOC
     {
         $this->log->veryVerbose("{$tests->count()} tests will be partitioned in {$this->settings->getProcessCount()} queues");
 
-        if ($this->settings->isSuccessfullyFetchedDurations())
+        if ($this->settings->isSuccessfullyFetchedDurations() && ($tests->count() > $this->settings->getProcessCount()))
         {
             return $this->divider->statBased($tests);
         }

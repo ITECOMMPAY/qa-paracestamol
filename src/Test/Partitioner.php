@@ -109,6 +109,13 @@ class Partitioner
             $durations->push($duration);
         }
 
+        if ($durations->isEmpty())
+        {
+            $this->log->veryVerbose('Not a single one of the given tests has the expected duration set - falling back to simple partitioning');
+
+            return $this->simple($testsWithoutDuration);
+        }
+
         $durations->sort();
 
         $this->settings->setMinTestDurationSec($durations->first());
