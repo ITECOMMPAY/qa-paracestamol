@@ -24,6 +24,7 @@ class CestWrapper extends AbstractCodeceptWrapper
     protected Vector $passedTestRecords;
     protected Vector $failedTestRecords;
 
+    protected ?bool $failFast = null;
     protected ?InputStream $inputStream = null;
     protected bool $waitsUntilTestStartAllowed = false;
 
@@ -77,6 +78,11 @@ class CestWrapper extends AbstractCodeceptWrapper
             '--no-rebuild',
         ];
 
+        if ($this->isFailFast())
+        {
+            $runOptions []= '--fail-fast';
+        }
+
         if (!empty($this->groupsRunString))
         {
             $runOptions []= '-g';
@@ -114,6 +120,16 @@ class CestWrapper extends AbstractCodeceptWrapper
         $this->inputStream = new InputStream();
 
         $proc->setInput($this->inputStream);
+    }
+
+    protected function isFailFast() : bool
+    {
+        return $this->failFast ?? $this->settings->isWholeCestFailFast();
+    }
+
+    public function setFailFast(bool $value) : void
+    {
+        $this->failFast = $value;
     }
 
     public function isRunning() : bool
@@ -211,6 +227,13 @@ class CestWrapper extends AbstractCodeceptWrapper
         if ($this->statusDescription === '' && $this->parsedJsonLog === null)
         {
             $this->statusDescription = $this->cestName . ': BROKEN ' . TextHelper::strip($this->getErrorOutput());
+        }
+
+        if ($this->statusDescription === '' && !$this->failedTestRecords->isEmpty() && $this->isFailFast())
+        {
+            $testRecord = $this->failedTestRecords->first();
+            $message = $testRecord->getMessagePlain();
+            $this->statusDescription = "$this->cestName:{$testRecord->getMethod()} (and following)" . ': ' . $message;
         }
 
         if ($this->statusDescription === '' && !$this->failedTestRecords->isEmpty())

@@ -45,6 +45,8 @@ class ClusterCestWrapper implements ICodeceptWrapper
         $this->cestName = $cestName;
 
         $this->cest = $wrapperFactory->getCestWrapper($cestName, $actualGroups, $expectedGroups);
+        $this->cest->setFailFast(false);
+
         $this->failedTests = new Queue();
     }
 

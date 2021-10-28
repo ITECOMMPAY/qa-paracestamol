@@ -38,6 +38,7 @@ class SettingsRun implements ICodeceptionHelperSettings
     protected bool      $rerunWholeSeries        =  false;
     protected bool      $serialBeforeFailsRun    =  false;
     protected bool      $fastCestRerun           =  true;
+    protected bool      $wholeCestFailFast       =  true;
     protected string    $cestWrapper             =  'tests';
     protected array     $dividable               =  [];
     protected array     $notDividableRerunWhole  =  [];
@@ -368,6 +369,13 @@ class SettingsRun implements ICodeceptionHelperSettings
         $this->immuneTests = $immuneTests;
     }
 
+    public function setWholeCestFailFast(bool $wholeCestFailFast) : void
+    {
+        $this->wholeCestFailFast = $wholeCestFailFast;
+    }
+
+
+
 
 
 
@@ -692,5 +700,10 @@ class SettingsRun implements ICodeceptionHelperSettings
     public function getImmuneTests() : array
     {
         return $this->immuneTests;
+    }
+
+    public function isWholeCestFailFast() : bool
+    {
+        return $this->wholeCestFailFast;
     }
 }

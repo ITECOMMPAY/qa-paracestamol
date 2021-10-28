@@ -63,6 +63,7 @@ class Run extends Command
             ->addOption('not_dividable_rerun_whole',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided into separate tests. If any test in the cest is failed then the whole cest will be reran')
             ->addOption('not_dividable_rerun_failed',  null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'These cests should not be divided into separate tests. If a test in the cest is failed then only the failed test will be reran')
             ->addOption('fast_cest_rerun',     null, InputOption::VALUE_REQUIRED, 'If all tests selected for the current run (or a rerun) from a Cest are failed - exclude the Cest from the following reruns')
+            ->addOption('whole_cest_fail_fast', null, InputOption::VALUE_REQUIRED, 'Cests from the \'not_dividable_rerun_whole\' group stop after the first failure')
 
             // Run stages options
             ->addOption('run_before_series',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Run these tests in the given order before the main run')
@@ -148,6 +149,7 @@ class Run extends Command
             $this->overrideSettings($input, 'rerun_whole_series');
             $this->overrideSettings($input, 'serial_before_fails_run');
             $this->overrideSettings($input, 'fast_cest_rerun');
+            $this->overrideSettings($input, 'whole_cest_fail_fast');
             $this->overrideSettings($input, 'bulk_rows_count');
             $this->overrideSettings($input, 'run_output_path');
             $this->overrideSettings($input, 'no_memory_limit');
