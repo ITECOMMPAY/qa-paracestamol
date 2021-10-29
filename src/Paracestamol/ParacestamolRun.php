@@ -88,13 +88,35 @@ class ParacestamolRun
 
     protected function rebuildActor() : bool
     {
+        //It seems that Codeception' build command is abandoned. It has poor documentation and it fails if a module
+        //doesn't have a default config and expects env files instead.
+        //So, to generate an Actor class let's just execute 'codecept run' with a non-existing group
+
         $codeceptionBin = $this->settings->getCodeceptionBinPath();
+
+        $suite = $this->settings->getSuite();
 
         $runOptions = [
             '--config', $this->settings->getCodeceptionConfigPath(),
+            '-o',       'paths: output: ' . $this->settings->getRunOutputPath(),
+            '--no-colors',
+            '--no-interaction',
+            '-g', 'paracestamolSpecialNonExistingGroup'
         ];
 
-        $cmd =  ['php', $codeceptionBin, 'build', ...$runOptions];
+        if (!empty($this->settings->getEnv()))
+        {
+            $runOptions []= '--env';
+            $runOptions []= $this->settings->getEnvAsString();
+        }
+
+        if (!empty($this->settings->getOverride()))
+        {
+            $runOptions []= '-o';
+            $runOptions []= $this->settings->getOverrideAsString();
+        }
+
+        $cmd = ['php', $codeceptionBin, 'run', $suite, ...$runOptions];
 
         $proc = new Process($cmd);
         $proc->setTimeout(null);
