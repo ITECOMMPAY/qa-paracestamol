@@ -90,7 +90,7 @@ class ParacestamolRun
     {
         //It seems that Codeception' build command is abandoned. It has poor documentation and it fails if a module
         //doesn't have a default config and expects env files instead.
-        //So, to generate an Actor class let's just execute 'codecept run' with a non-existing group
+        //So, to generate an Actor class let's just execute 'codecept run' with a non-existing cest and swallow error
 
         $codeceptionBin = $this->settings->getCodeceptionBinPath();
 
@@ -101,7 +101,6 @@ class ParacestamolRun
             '-o',       'paths: output: ' . $this->settings->getRunOutputPath(),
             '--no-colors',
             '--no-interaction',
-            '-g', 'paracestamolSpecialNonExistingGroup'
         ];
 
         if (!empty($this->settings->getEnv()))
@@ -116,19 +115,20 @@ class ParacestamolRun
             $runOptions []= $this->settings->getOverrideAsString();
         }
 
-        $cmd = ['php', $codeceptionBin, 'run', $suite, ...$runOptions];
+        $cmd = ['php', $codeceptionBin, 'run', $suite, 'ParacestamolSpecialNonExistingCest', ...$runOptions];
 
         $proc = new Process($cmd);
         $proc->setTimeout(null);
         $proc->setIdleTimeout( null);
         $proc->run();
 
-        if (!$proc->isSuccessful())
+        if (!$proc->isSuccessful() && strpos($proc->getErrorOutput(), 'ParacestamolSpecialNonExistingCest') === false)
         {
             $this->log->note($proc->getErrorOutput());
+            return false;
         }
 
-        return $proc->isSuccessful();
+        return true;
     }
 
     protected function runInParallel(string $runName, Queue $tests, int $runCount, bool $continuousRerun) : Queue
