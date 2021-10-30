@@ -327,7 +327,7 @@ class RunnersSupervisor
 
         $this->failedTestsRerunCounts->put($test, ++$rerunCount);
 
-        return $rerunCount === $this->settings->getRerunCount();
+        return $rerunCount >= $this->settings->getRerunCount();
     }
 
     protected function explodeClusterCest(ClusterCestWrapper $cest) : Queue
