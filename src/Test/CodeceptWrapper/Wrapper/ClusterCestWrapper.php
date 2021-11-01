@@ -5,7 +5,7 @@ namespace Paracestamol\Test\CodeceptWrapper\Wrapper;
 
 use Ds\Queue;
 use Ds\Set;
-use Paracestamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracestamol\Helpers\XmlLogParser\Records\TestCaseRecord;
 use Paracestamol\Helpers\TestNameParts;
 use Paracestamol\Log\Log;
 use Paracestamol\Test\CodeceptWrapper\CodeceptWrapperFactory;
@@ -138,10 +138,10 @@ class ClusterCestWrapper implements ICodeceptWrapper
     {
         if ($this->isFirstRun())
         {
-            /** @var TestRecord $testRecord */
-            foreach ($this->cest->getPassedTestRecords() as $testRecord)
+            /** @var TestCaseRecord $testCaseRecord */
+            foreach ($this->cest->getPassedTestRecords() as $testCaseRecord)
             {
-                $this->actualDuration += $testRecord->getTime();
+                $this->actualDuration += $testCaseRecord->getTime();
             }
 
             return;
@@ -164,10 +164,10 @@ class ClusterCestWrapper implements ICodeceptWrapper
         {
             $totalDuration = $this->cest->getExpectedDuration();
 
-            /** @var TestRecord $testRecord */
-            foreach ($this->cest->getPassedTestRecords() as $testRecord)
+            /** @var TestCaseRecord $testCaseRecord */
+            foreach ($this->cest->getPassedTestRecords() as $testCaseRecord)
             {
-                $totalDuration -= $testRecord->getTime();
+                $totalDuration -= $testCaseRecord->getTime();
             }
 
             $this->expectedDuration = $totalDuration > 0 ? $totalDuration : 1;
@@ -184,10 +184,10 @@ class ClusterCestWrapper implements ICodeceptWrapper
 
     protected function parseFailedTestRecords() : void
     {
-        /** @var TestRecord $testRecord */
-        foreach ($this->cest->getFailedTestRecords() as $testRecord)
+        /** @var TestCaseRecord $testCaseRecord */
+        foreach ($this->cest->getFailedTestRecords() as $testCaseRecord)
         {
-            $test = $this->wrapperFactory->getTestWrapper($this->cestName, $testRecord->getMethod());
+            $test = $this->wrapperFactory->getTestWrapper($this->cestName, $testCaseRecord->getName());
             $this->failedTests->push($test);
         }
     }

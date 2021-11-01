@@ -2,9 +2,10 @@
 
 namespace Paracestamol\Test\CodeceptWrapper;
 
-use Paracestamol\Helpers\JsonLogParser\JsonLogParser;
-use Paracestamol\Helpers\JsonLogParser\JsonLogParserFactory;
+use Paracestamol\Exceptions\LogParserException;
 use Paracestamol\Helpers\TestNameParts;
+use Paracestamol\Helpers\XmlLogParser\LogParserFactory;
+use Paracestamol\Helpers\XmlLogParser\XmlLogParser;
 use Paracestamol\Log\Log;
 use Paracestamol\Settings\SettingsRun;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -14,16 +15,16 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
 {
     protected Log                  $log;
     protected SettingsRun          $settings;
-    protected JsonLogParserFactory $jsonLogParserFactory;
+    protected LogParserFactory     $logParserFactory;
 
     protected string               $cestName;
     protected string               $methodName;
     protected string               $testName;
 
-    protected string               $jsonLogName;
-    private   string               $jsonLogFullpath;
+    protected string               $xmlLogName;
+    private   string               $xmlLogFullpath;
 
-    protected ?JsonLogParser       $parsedJsonLog     = null;
+    protected ?XmlLogParser        $parsedXmlLog      = null;
     private   ?int                 $startTime         = null;
     private   ?int                 $expectedDuration  = null;
     private   ?int                 $actualDuration    = null;
@@ -31,25 +32,25 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
     private   ?Process             $proc              = null;
     protected string               $statusDescription = '';
 
-    public function __construct(Log $log, SettingsRun $settings, JsonLogParserFactory $jsonLogParserFactory, string $cestName, string $methodName)
+    public function __construct(Log $log, SettingsRun $settings, LogParserFactory $logParserFactory, string $cestName, string $methodName)
     {
         $this->log                  = $log;
         $this->settings             = $settings;
-        $this->jsonLogParserFactory = $jsonLogParserFactory;
+        $this->logParserFactory     = $logParserFactory;
 
         $this->cestName             = $cestName;
         $this->methodName           = $methodName;
         $this->testName             = "$cestName:$methodName";
 
-        $this->initJsonLog();
+        $this->initXmlLog();
 
         $this->log->debug($this->testName);
     }
 
-    protected function initJsonLog()
+    protected function initXmlLog()
     {
-        $this->jsonLogName     = sha1($this->testName . bin2hex(random_bytes(8))) . '.json';
-        $this->jsonLogFullpath = $this->settings->getRunOutputPath() . DIRECTORY_SEPARATOR . $this->jsonLogName;
+        $this->xmlLogName     = sha1($this->testName . bin2hex(random_bytes(8))) . '.xml';
+        $this->xmlLogFullpath = $this->settings->getRunOutputPath() . DIRECTORY_SEPARATOR . $this->xmlLogName;
     }
 
     abstract protected function getCmd() : array;
@@ -61,9 +62,9 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         $this->timedOut          = false;
         $this->proc              = null;
         $this->statusDescription = '';
-        $this->parsedJsonLog     = null;
+        $this->parsedXmlLog     = null;
 
-        $this->tryDeleteJsonLog();
+        $this->tryDeleteXmlLog();
     }
 
     public function start() : void
@@ -90,21 +91,22 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
 
     }
 
-    private function parseJsonLog() : void
+    private function parseXmlLog() : void
     {
-        if (!file_exists($this->jsonLogFullpath))
+        if (!file_exists($this->xmlLogFullpath))
         {
             return;  // Test failed to start
         }
 
-        $contents = file_get_contents($this->jsonLogFullpath);
-
-        if (empty($contents)) // Test failed to start
+        try
         {
-            return;
+            $this->parsedXmlLog = $this->logParserFactory->get($this->xmlLogFullpath);
         }
-
-        $this->parsedJsonLog = $this->jsonLogParserFactory->get($contents);
+        catch (LogParserException $e)
+        {
+            $this->log->note($this->testName . ': ' . $e->getMessage());
+            $this->parsedXmlLog = null;
+        }
     }
 
     public function isRunning() : bool
@@ -125,8 +127,8 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
 
         if (!$result)
         {
-            $this->parseJsonLog();
-            $this->tryDeleteJsonLog();
+            $this->parseXmlLog();
+            $this->tryDeleteXmlLog();
         }
 
         return $result;
@@ -215,16 +217,16 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         return $this->actualDuration;
     }
 
-    private function tryDeleteJsonLog()
+    private function tryDeleteXmlLog()
     {
-        @unlink($this->jsonLogFullpath);
+        @unlink($this->xmlLogFullpath);
     }
 
     //========================================================================
 
     public function __destruct()
     {
-        $this->tryDeleteJsonLog();
+        $this->tryDeleteXmlLog();
     }
 
     public function __toString()
@@ -249,7 +251,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
 
     public function __clone()
     {
-        $this->initJsonLog();
+        $this->initXmlLog();
 
         $this->reset();
     }

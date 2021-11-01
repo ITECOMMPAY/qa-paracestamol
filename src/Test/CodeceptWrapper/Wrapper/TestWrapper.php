@@ -2,7 +2,7 @@
 
 namespace Paracestamol\Test\CodeceptWrapper\Wrapper;
 
-use Paracestamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracestamol\Helpers\XmlLogParser\Records\TestCaseRecord;
 use Paracestamol\Helpers\TextHelper;
 use Paracestamol\Test\CodeceptWrapper\AbstractCodeceptWrapper;
 
@@ -16,7 +16,7 @@ class TestWrapper extends AbstractCodeceptWrapper
 
         $runOptions = [
             '--config', $this->settings->getCodeceptionConfigPath(),
-            '--json',   $this->jsonLogName,
+            '--xml',    $this->xmlLogName,
             '-o',       'paths: output: ' . $this->settings->getRunOutputPath(),
             '--no-colors',
             '--no-interaction',
@@ -40,37 +40,37 @@ class TestWrapper extends AbstractCodeceptWrapper
 
     public function isSuccessful() : bool
     {
-        if ($this->parsedJsonLog === null || !parent::isSuccessful())
+        if ($this->parsedXmlLog === null || $this->parsedXmlLog->getTestCases()->isEmpty() || !parent::isSuccessful())
         {
             return false;
         }
 
-        /** @var TestRecord $testRecord */
-        $testRecord = $this->parsedJsonLog->getTests()->first()->value;
-        return $testRecord->isPassed();
+        /** @var TestCaseRecord $testCaseRecord */
+        $testCaseRecord = $this->parsedXmlLog->getTestCases()->first()->value;
+        return $testCaseRecord->isPassed();
     }
 
     public function isMarkedSkipped() : bool
     {
-        if ($this->parsedJsonLog === null)
+        if ($this->parsedXmlLog === null || $this->parsedXmlLog->getTestCases()->isEmpty())
         {
             return false;
         }
 
-        /** @var TestRecord $testRecord */
-        $testRecord = $this->parsedJsonLog->getTests()->first()->value;
-        return $testRecord->isSkipped();
+        /** @var TestCaseRecord $testCaseRecord */
+        $testCaseRecord = $this->parsedXmlLog->getTestCases()->first()->value;
+        return $testCaseRecord->isSkipped();
     }
 
     public function getStatusDescription() : string
     {
         if ($this->statusDescription === '')
         {
-            if ($this->parsedJsonLog !== null)
+            if ($this->parsedXmlLog !== null && !$this->parsedXmlLog->getTestCases()->isEmpty())
             {
-                /** @var TestRecord $testRecord */
-                $testRecord = $this->parsedJsonLog->getTests()->first()->value;
-                $this->statusDescription = $testRecord->getMessagePlain();
+                /** @var TestCaseRecord $testCaseRecord */
+                $testCaseRecord = $this->parsedXmlLog->getTestCases()->first()->value;
+                $this->statusDescription = $testCaseRecord->getMessage();
             }
             else
             {

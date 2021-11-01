@@ -4,9 +4,9 @@ namespace Paracestamol\Test\CodeceptWrapper\Wrapper;
 
 use Ds\Set;
 use Ds\Vector;
-use Paracestamol\Helpers\JsonLogParser\JsonLogParserFactory;
-use Paracestamol\Helpers\JsonLogParser\Records\TestRecord;
+use Paracestamol\Helpers\XmlLogParser\Records\TestCaseRecord;
 use Paracestamol\Helpers\TextHelper;
+use Paracestamol\Helpers\XmlLogParser\LogParserFactory;
 use Paracestamol\Log\Log;
 use Paracestamol\Module\ParacestamolHelper;
 use Paracestamol\Settings\SettingsRun;
@@ -24,13 +24,13 @@ class CestWrapper extends AbstractCodeceptWrapper
     protected Vector $passedTestRecords;
     protected Vector $failedTestRecords;
 
-    protected ?bool $failFast = null;
+    protected ?bool        $failFast = null;
     protected ?InputStream $inputStream = null;
-    protected bool $waitsUntilTestStartAllowed = false;
+    protected bool         $waitsUntilTestStartAllowed = false;
 
-    public function __construct(Log $log, SettingsRun $settings, JsonLogParserFactory $jsonLogParserFactory, Delayer $delayer, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
+    public function __construct(Log $log, SettingsRun $settings, LogParserFactory $logParserFactory, Delayer $delayer, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
     {
-        parent::__construct($log, $settings, $jsonLogParserFactory, $cestName, $this->determineName($actualGroups, $expectedGroups));
+        parent::__construct($log, $settings, $logParserFactory, $cestName, $this->determineName($actualGroups, $expectedGroups));
 
         $this->passedTestRecords = new Vector();
         $this->failedTestRecords = new Vector();
@@ -71,7 +71,7 @@ class CestWrapper extends AbstractCodeceptWrapper
 
         $runOptions = [
             '--config', $this->settings->getCodeceptionConfigPath(),
-            '--json',   $this->jsonLogName,
+            '--xml',    $this->xmlLogName,
             '-o',       'paths: output: ' . $this->settings->getRunOutputPath(),
             '--no-colors',
             '--no-interaction',
@@ -182,29 +182,29 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     protected function parseFailedTests() : void
     {
-        if ($this->parsedJsonLog === null)
+        if ($this->parsedXmlLog === null)
         {
             $this->log->note($this . ' -> broken or timed out' . PHP_EOL . $this->getErrorOutput());
             return;
         }
 
-        /** @var TestRecord $testRecord */
-        foreach ($this->parsedJsonLog->getTests() as $testRecord)
+        /** @var TestCaseRecord $testCaseRecord */
+        foreach ($this->parsedXmlLog->getTestCases() as $testCaseRecord)
         {
-            if ($testRecord->isPassed())
+            if ($testCaseRecord->isPassed())
             {
-                $this->passedTestRecords->push($testRecord);
+                $this->passedTestRecords->push($testCaseRecord);
             }
             else
             {
-                $this->failedTestRecords->push($testRecord);
+                $this->failedTestRecords->push($testCaseRecord);
             }
         }
     }
 
     public function isSuccessful() : bool
     {
-        if ($this->parsedJsonLog === null || !parent::isSuccessful())
+        if ($this->parsedXmlLog === null || !parent::isSuccessful())
         {
             return false;
         }
@@ -224,33 +224,34 @@ class CestWrapper extends AbstractCodeceptWrapper
             $this->statusDescription = $this->cestName . ': TIMEOUT';
         }
 
-        if ($this->statusDescription === '' && $this->parsedJsonLog === null)
+        if ($this->statusDescription === '' && $this->parsedXmlLog === null)
         {
             $this->statusDescription = $this->cestName . ': BROKEN ' . TextHelper::strip($this->getErrorOutput());
         }
 
         if ($this->statusDescription === '' && !$this->failedTestRecords->isEmpty() && $this->isFailFast())
         {
-            $testRecord = $this->failedTestRecords->first();
-            $message = $testRecord->getMessagePlain();
-            $this->statusDescription = "$this->cestName:{$testRecord->getMethod()} (and following)" . ': ' . $message;
+            /** @var TestCaseRecord $testCaseRecord */
+            $testCaseRecord = $this->failedTestRecords->first();
+            $message        = $testCaseRecord->getMessage();
+            $this->statusDescription = "$this->cestName:{$testCaseRecord->getName()} (and following)" . ': ' . $message;
         }
 
         if ($this->statusDescription === '' && !$this->failedTestRecords->isEmpty())
         {
             $messages = [];
 
-            /** @var TestRecord $testRecord */
-            foreach ($this->failedTestRecords as $testRecord)
+            /** @var TestCaseRecord $testCaseRecord */
+            foreach ($this->failedTestRecords as $testCaseRecord)
             {
-                $message = $testRecord->getMessagePlain();
+                $message = $testCaseRecord->getMessage();
 
                 if ($message === '')
                 {
                     continue;
                 }
 
-                $messages []= "$this->cestName:{$testRecord->getMethod()}" . ': ' . $message;
+                $messages []= "$this->cestName:{$testCaseRecord->getName()}" . ': ' . $message;
             }
 
             $this->statusDescription = implode(PHP_EOL, $messages);
