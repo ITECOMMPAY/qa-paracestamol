@@ -27,9 +27,7 @@ class TestCaseRecord implements Hashable
             throw new LogParserException('Can\'t parse a test name from the record: ' . $reader->readString());
         }
 
-        $this->name = mb_strtolower($name); // I don't know why they uppercase the first letter of a test name in their xml-log
-                                            // but it forced me to mb_strtolower all test names across the whole program
-
+        $this->name = $name;
         $this->time = (float) ($reader->getAttribute('time') ?? '0.0');
 
         $this->parseStatus($reader);
