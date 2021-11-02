@@ -39,7 +39,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         $this->logParserFactory     = $logParserFactory;
 
         $this->cestName             = $cestName;
-        $this->methodName           = $methodName;
+        $this->methodName           = mb_strtolower($methodName);
         $this->testName             = "$cestName:$methodName";
 
         $this->initXmlLog();
@@ -177,7 +177,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
 
     public function getMatch(TestNameParts $nameParts) : ?string
     {
-        if ($nameParts->matchesTest((string) $this))
+        if ($nameParts->matchesTest($this->cestName, $this->methodName))
         {
             return $this;
         }

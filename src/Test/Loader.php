@@ -236,15 +236,15 @@ class Loader
     {
         $testName = "$cestName:$methodName";
 
-        if ($this->skipTests->matchesTest($testName)
-            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName) || $this->immuneTests->matchesTest($testName)))
+        if ($this->skipTests->matchesTest($cestName, $methodName)
+            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName) || $this->immuneTests->matchesTest($cestName, $methodName)))
         {
             $this->log->debug($testName . ' -> skipped (in skip_tests)');
             return;
         }
 
         if ($this->notInExpectedGroups($actualGroups, $expectedGroups)
-            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName) || $this->immuneTests->matchesTest($testName)))
+            && !($this->immuneTests->matchesPath($path) || $this->immuneTests->matchesCest($cestName) || $this->immuneTests->matchesTest($cestName, $methodName)))
         {
             $this->log->debug($testName . ' -> skipped (not in a group)');
             return;

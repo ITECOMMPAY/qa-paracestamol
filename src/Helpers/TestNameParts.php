@@ -22,9 +22,9 @@ class TestNameParts
 
         foreach ($strings as $string)
         {
-            if (strpos($string, '.php:') !== false)
+            if ($testName = $this->normalizeTestName($string))
             {
-                $this->tests->add($string);
+                $this->tests->add($testName);
                 continue;
             }
 
@@ -60,9 +60,15 @@ class TestNameParts
         return $this->strings;
     }
 
-    public function matchesTest(string $testName) : bool
+    public function matchesTest(string $testName, string $methodName = '') : bool
     {
-        return $this->getTests()->contains($testName);
+        if ($methodName !== '')
+        {
+            $methodName = mb_strtolower($methodName);
+            return $this->getTests()->contains("$testName:$methodName");
+        }
+
+        return $this->getTests()->contains($this->normalizeTestName($testName));
     }
 
     public function matchesCest(string $cestName) : bool
@@ -81,6 +87,21 @@ class TestNameParts
         }
 
         return false;
+    }
+
+    private function normalizeTestName(string $testName) : ?string
+    {
+        $p = mb_strpos($testName, '.php:');
+
+        if ($p === false)
+        {
+            return null;
+        }
+
+        $cestName = mb_substr($testName, 0, $p+4);
+        $testName = mb_strtolower(mb_substr($testName, $p+5));
+
+        return "$cestName:$testName";
     }
 
     private function getSubpaths(string $path) : array

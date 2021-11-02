@@ -72,7 +72,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
             return;
         }
 
-        $this->runner = $this->runnerFactory->get($this->failedTests);
+        $this->runner = $this->runnerFactory->get($this->failedTests)->setLabel('(RERUN)');
         $this->runner->forbidAdvancingProgressBar();
     }
 
@@ -328,7 +328,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
             $stillFailedTests->push($failedTest);
         }
 
-        $this->failedTests = $stillFailedTests;
+        $this->failedTests = $this->collectStrings($stillFailedTests);
     }
 
     public function __toString()
