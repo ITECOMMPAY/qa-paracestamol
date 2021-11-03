@@ -6,14 +6,13 @@ namespace Paracestamol\Test;
 
 use Ds\Map;
 use Ds\Queue;
-use Ds\Set;
 use Paracestamol\Helpers\TestNameParts;
 use Paracestamol\Log\Log;
 use Paracestamol\Settings\SettingsRun;
 use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
 use Paracestamol\Test\CodeceptWrapper\Wrapper\CestWrapper;
 use Paracestamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper;
-use Paracestamol\Test\CodeceptWrapper\Wrapper\TestWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper\IClusterBomblet;
 
 class RunnersSupervisor
 {
@@ -34,7 +33,6 @@ class RunnersSupervisor
     protected ?Runner       $mostBurdenedRunner = null;
 
     protected Queue         $explodedClusterCests;
-    protected Set           $testNamesFromExplodedClusterCests;
 
     protected TestNameParts $skipRerunsForTestNames;
 
@@ -54,7 +52,6 @@ class RunnersSupervisor
         $this->markedSkippedTests   = new Queue();
 
         $this->explodedClusterCests = new Queue();
-        $this->testNamesFromExplodedClusterCests = new Set();
 
         $this->passedTestsDurations   = new Map();
         $this->failedTestsRerunCounts = new Map();
@@ -340,8 +337,6 @@ class RunnersSupervisor
 
         foreach ($cest->explode() as $failedTest)
         {
-            $this->testNamesFromExplodedClusterCests->add((string) $failedTest);
-
             $this->failedTestsRerunCounts->put($failedTest, $cestCurrentRerunCount);
 
             $result->push($failedTest);
@@ -366,6 +361,7 @@ class RunnersSupervisor
 
             if ($clusterCest->isSuccessful())
             {
+                $this->log->progressAdvance();
                 $this->passedTestsDurations->put((string) $clusterCest, $clusterCest->getActualDuration());
                 continue;
             }
@@ -377,7 +373,7 @@ class RunnersSupervisor
 
         foreach ($this->failedTestsNoRerun as $failedTest)
         {
-            if ($failedTest instanceof TestWrapper && $this->testNamesFromExplodedClusterCests->contains((string) $failedTest))
+            if ($failedTest instanceof IClusterBomblet)
             {
                 continue;
             }

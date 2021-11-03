@@ -8,8 +8,8 @@ use Ds\Set;
 use Paracestamol\Helpers\XmlLogParser\Records\TestCaseRecord;
 use Paracestamol\Helpers\TestNameParts;
 use Paracestamol\Log\Log;
-use Paracestamol\Test\CodeceptWrapper\CodeceptWrapperFactory;
 use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper\BombletWrapperFactory;
 use Paracestamol\Test\Runner;
 use Paracestamol\Test\RunnerFactory;
 
@@ -19,7 +19,7 @@ use Paracestamol\Test\RunnerFactory;
 class ClusterCestWrapper implements ICodeceptWrapper
 {
     protected Log                    $log;
-    protected CodeceptWrapperFactory $wrapperFactory;
+    protected BombletWrapperFactory  $wrapperFactory;
     protected RunnerFactory          $runnerFactory;
 
     protected string                 $cestName;
@@ -36,7 +36,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
     protected bool                   $hasPassedTestsThisRun = false;
     protected int                    $previousRunFailedTestsCount = 0;
 
-    public function __construct(Log $log, CodeceptWrapperFactory $wrapperFactory, RunnerFactory $runnerFactory, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
+    public function __construct(Log $log, BombletWrapperFactory $wrapperFactory, RunnerFactory $runnerFactory, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
     {
         $this->log = $log;
         $this->wrapperFactory = $wrapperFactory;
@@ -45,7 +45,6 @@ class ClusterCestWrapper implements ICodeceptWrapper
         $this->cestName = $cestName;
 
         $this->cest = $wrapperFactory->getCestWrapper($cestName, $actualGroups, $expectedGroups);
-        $this->cest->setFailFast(false);
 
         $this->failedTests = new Queue();
     }
@@ -73,7 +72,6 @@ class ClusterCestWrapper implements ICodeceptWrapper
         }
 
         $this->runner = $this->runnerFactory->get($this->failedTests)->setLabel('(RERUN)');
-        $this->runner->forbidAdvancingProgressBar();
     }
 
     protected function isFirstRun() : bool

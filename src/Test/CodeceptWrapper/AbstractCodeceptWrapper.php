@@ -104,7 +104,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         }
         catch (LogParserException $e)
         {
-            $this->log->note($this->testName . ': ' . $e->getMessage());
+            $this->log->debug($this->testName . ': ' . $e->getMessage());
             $this->parsedXmlLog = null;
         }
     }

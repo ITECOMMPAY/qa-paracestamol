@@ -8,6 +8,7 @@ use Ds\Map;
 use Ds\Queue;
 use Paracestamol\Log\Log;
 use Paracestamol\Test\CodeceptWrapper\ICodeceptWrapper;
+use Paracestamol\Test\CodeceptWrapper\Wrapper\ClusterCestWrapper\IClusterBomblet;
 
 class Runner
 {
@@ -23,7 +24,6 @@ class Runner
     protected ?ICodeceptWrapper $currentTest = null;
 
     protected string   $label = '';
-    protected bool     $progressAllowed = true;
 
 
     public function __construct(Log $log, Delayer $delayer, Queue $queue)
@@ -67,7 +67,7 @@ class Runner
 
             $this->log->verbose('[PASS] ' . $this->currentTest . " {$this->getLabel()}");
 
-            if ($this->progressAllowed)
+            if (!($this->currentTest instanceof IClusterBomblet))
             {
                 $this->log->progressAdvance();
             }
@@ -99,11 +99,6 @@ class Runner
         }
 
         return true;
-    }
-
-    public function forbidAdvancingProgressBar() : void
-    {
-        $this->progressAllowed = false;
     }
 
     public function setLabel(string $label) : Runner

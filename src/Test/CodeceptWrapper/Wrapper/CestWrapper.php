@@ -24,7 +24,6 @@ class CestWrapper extends AbstractCodeceptWrapper
     protected Vector $passedTestRecords;
     protected Vector $failedTestRecords;
 
-    protected ?bool        $failFast = null;
     protected ?InputStream $inputStream = null;
     protected bool         $waitsUntilTestStartAllowed = false;
 
@@ -124,12 +123,7 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     protected function isFailFast() : bool
     {
-        return $this->failFast ?? $this->settings->isWholeCestFailFast();
-    }
-
-    public function setFailFast(bool $value) : void
-    {
-        $this->failFast = $value;
+        return $this->settings->isWholeCestFailFast();
     }
 
     public function isRunning() : bool
