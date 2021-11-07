@@ -34,9 +34,9 @@ class CodeceptWrapperFactory
         $this->bombletWrapperFactory = $bombletWrapperFactory;
     }
 
-    public function getTestWrapper(string $cestName, string $methodName) : TestWrapper
+    public function getTestWrapper(string $cestName, string $methodName, Set $actualGroups) : TestWrapper
     {
-        return new TestWrapper($this->log, $this->settings, $this->logParserFactory, $cestName, $methodName);
+        return new TestWrapper($this->log, $this->settings, $this->logParserFactory, $cestName, $methodName, $actualGroups);
     }
 
     public function getCestWrapper(string $cestName, Set $actualGroups, ?Set $expectedGroups = null) : CestWrapper

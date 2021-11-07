@@ -3,7 +3,9 @@
 namespace Paracestamol\Helpers;
 
 use Codeception\Exception\ConfigurationException;
+//use Codeception\Lib\Notification;
 use Codeception\Lib\ParamsLoader;
+//use Codeception\Util\Autoload;
 use Codeception\Util\Template;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -253,6 +255,18 @@ class CodeceptionConfig
             self::$envsDir = $config['paths']['envs'];
         }
 
+//        Autoload::addNamespace(self::$config['namespace'], self::supportDir());
+//
+//        if ($config['settings']['bootstrap']) {
+//            $bootstrap = self::$config['settings']['bootstrap'];
+//            Notification::deprecate("'settings: bootstrap: $bootstrap' option is deprecated! Replace it with: 'bootstrap: $bootstrap' (not under settings section). See https://bit.ly/2YrRzVc ");
+//            try {
+//                self::loadBootstrap($bootstrap, self::testsDir());
+//            } catch (ConfigurationException $exception) {
+//                Notification::deprecate("Bootstrap file ($bootstrap) is defined in configuration but can't be loaded. Disable 'settings: bootstrap:' configuration to remove this message");
+//            }
+//        }
+//        self::loadBootstrap($config['bootstrap'], self::testsDir());
         self::loadSuites();
 
         return $config;

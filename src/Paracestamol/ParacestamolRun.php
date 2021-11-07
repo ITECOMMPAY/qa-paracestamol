@@ -63,8 +63,8 @@ class ParacestamolRun
             'runAfterInSeries'    => $runAfterInSeries,
         ] = $this->partitionInBeforeAfterGroups($tests);
 
-        $runBeforeInSeries = $this->sortByTestNameParts($runBeforeInSeries, new TestNameParts($this->settings->getRunBeforeSeries()));
-        $runAfterInSeries  = $this->sortByTestNameParts($runAfterInSeries,  new TestNameParts($this->settings->getRunAfterSeries()));
+        $runBeforeInSeries = $this->sortInOrderOfTestNameParts($runBeforeInSeries, new TestNameParts($this->settings->getRunBeforeSeries()));
+        $runAfterInSeries  = $this->sortInOrderOfTestNameParts($runAfterInSeries, new TestNameParts($this->settings->getRunAfterSeries()));
 
         $runCount = 1 + $this->settings->getRerunCount();
 
@@ -241,7 +241,7 @@ class ParacestamolRun
 
             if ($this->settings->isRerunWholeSeries())
             {
-                [$tests, $clonedTests] = $this->cloneQueue($tests);
+                [$tests, $clonedTests] = $this->deepCloneQueue($tests);
             }
 
             $runSupervisor = $this->runnersSupervisorFactory->get([$tests], false);
@@ -352,7 +352,7 @@ HEREDOC
         ];
     }
 
-    protected function sortByTestNameParts(Queue $tests, TestNameParts $parts) : Queue
+    protected function sortInOrderOfTestNameParts(Queue $tests, TestNameParts $parts) : Queue
     {
         $nameToPosition = array_flip($parts->getStrings());
 
@@ -390,7 +390,7 @@ HEREDOC
         return $this->divider->simple($tests);
     }
 
-    protected function fetchTestDurations(Queue $tests)
+    protected function fetchTestDurations(Queue $tests) : Queue
     {
         if (empty($this->settings->getStatEndpoint()))
         {
@@ -576,7 +576,7 @@ HEREDOC
         $this->sendTestsDurations($failedTestsDurations);
     }
 
-    protected function cloneQueue(Queue $queue) : array
+    protected function deepCloneQueue(Queue $queue) : array
     {
         $original = new Queue();
         $clone    = new Queue();

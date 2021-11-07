@@ -26,9 +26,9 @@ class BombletWrapperFactory
         $this->runnerFactory        = $runnerFactory;
     }
 
-    public function getTestWrapper(string $cestName, string $methodName) : BombletTestWrapper
+    public function getTestWrapper(string $cestName, string $methodName, Set $actualGroups) : BombletTestWrapper
     {
-        return new BombletTestWrapper($this->log, $this->settings, $this->logParserFactory, $cestName, $methodName);
+        return new BombletTestWrapper($this->log, $this->settings, $this->logParserFactory, $cestName, $methodName, $actualGroups);
     }
 
     public function getCestWrapper(string $cestName, Set $actualGroups, ?Set $expectedGroups = null) : BombletCestWrapper

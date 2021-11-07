@@ -29,7 +29,7 @@ class CestWrapper extends AbstractCodeceptWrapper
 
     public function __construct(Log $log, SettingsRun $settings, LogParserFactory $logParserFactory, Delayer $delayer, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
     {
-        parent::__construct($log, $settings, $logParserFactory, $cestName, $this->determineName($actualGroups, $expectedGroups));
+        parent::__construct($log, $settings, $logParserFactory, $cestName, $this->determineName($actualGroups, $expectedGroups), $actualGroups);
 
         $this->passedTestRecords = new Vector();
         $this->failedTestRecords = new Vector();
