@@ -3,6 +3,7 @@
 namespace Paracestamol\Test\CodeceptWrapper;
 
 use Ds\Hashable;
+use Ds\Set;
 use Paracestamol\Helpers\TestNameParts;
 
 interface ICodeceptWrapper extends Hashable
@@ -27,6 +28,8 @@ interface ICodeceptWrapper extends Hashable
     public function matches(TestNameParts $nameParts) : bool;
 
     public function getMatch(TestNameParts $nameParts) : ?string;
+
+    public function inGroups(Set $expectedGroups) : bool;
 
 
     public function getExpectedDuration() : ?int;

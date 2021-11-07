@@ -103,23 +103,6 @@ class Log
         $this->style->progressAdvance($step);
     }
 
-    public function progressFinish() : void
-    {
-        if (!isset($this->style))
-        {
-            return;
-        }
-
-        $this->progressMax = -1;
-
-        if ($this->style->getVerbosity() !== OutputStyle::VERBOSITY_NORMAL)
-        {
-            return;
-        }
-
-        $this->style->progressFinish();
-    }
-
     public function normal($message) : void
     {
         $this->writeln($message, OutputStyle::VERBOSITY_NORMAL);

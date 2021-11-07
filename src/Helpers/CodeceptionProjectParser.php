@@ -6,7 +6,7 @@ use Codeception\Util\PathResolver;
 use Paracestamol\Exceptions\GeneralException;
 use Paracestamol\Exceptions\InvalidArgumentException;
 use Paracestamol\Log\Log;
-use Paracestamol\Settings\ICodeceptionHelperSettings;
+use Paracestamol\Settings\IStoreCodeceptionParams;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -15,7 +15,7 @@ trait CodeceptionProjectParser
 {
     abstract protected function getLog() : Log;
 
-    abstract protected function getSettings() : ICodeceptionHelperSettings;
+    abstract protected function getSettings() : IStoreCodeceptionParams;
 
     protected function resolveCodeceptionBinPath() : void
     {

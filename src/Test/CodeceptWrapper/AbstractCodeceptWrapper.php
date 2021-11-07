@@ -2,6 +2,7 @@
 
 namespace Paracestamol\Test\CodeceptWrapper;
 
+use Ds\Set;
 use Paracestamol\Exceptions\LogParserException;
 use Paracestamol\Helpers\TestNameParts;
 use Paracestamol\Helpers\XmlLogParser\LogParserFactory;
@@ -19,6 +20,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
 
     protected string               $cestName;
     protected string               $methodName;
+    protected Set                  $actualGroups;
     protected string               $testName;
 
     protected string               $xmlLogName;
@@ -32,7 +34,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
     private   ?Process             $proc              = null;
     protected string               $statusDescription = '';
 
-    public function __construct(Log $log, SettingsRun $settings, LogParserFactory $logParserFactory, string $cestName, string $methodName)
+    public function __construct(Log $log, SettingsRun $settings, LogParserFactory $logParserFactory, string $cestName, string $methodName, Set $actualGroups)
     {
         $this->log                  = $log;
         $this->settings             = $settings;
@@ -41,6 +43,7 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         $this->cestName             = $cestName;
         $this->methodName           = $methodName;
         $this->testName             = "$cestName:$methodName";
+        $this->actualGroups         = $actualGroups;
 
         $this->initXmlLog();
 
@@ -195,6 +198,11 @@ abstract class AbstractCodeceptWrapper implements ICodeceptWrapper
         }
 
         return null;
+    }
+
+    public function inGroups(Set $expectedGroups) : bool
+    {
+        return !$this->actualGroups->intersect($expectedGroups)->isEmpty();
     }
 
     public function getExpectedDuration() : ?int

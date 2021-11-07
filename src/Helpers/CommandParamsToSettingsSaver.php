@@ -2,13 +2,13 @@
 
 namespace Paracestamol\Helpers;
 
-use Paracestamol\Settings\ICodeceptionHelperSettings;
+use Paracestamol\Settings\IStoreCodeceptionParams;
 use Paracestamol\Settings\ISettingsSerializer;
 use Symfony\Component\Console\Input\InputInterface;
 
 trait CommandParamsToSettingsSaver
 {
-    abstract protected function getSettings() : ICodeceptionHelperSettings;
+    abstract protected function getSettings() : IStoreCodeceptionParams;
 
     abstract protected function getSettingsSerializer() : ISettingsSerializer;
 

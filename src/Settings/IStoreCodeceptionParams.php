@@ -2,7 +2,7 @@
 
 namespace Paracestamol\Settings;
 
-interface ICodeceptionHelperSettings
+interface IStoreCodeceptionParams
 {
     public function setCodeceptionBinPath(string $path) : void;
 

@@ -7,7 +7,7 @@ use Ds\Set;
 use Paracestamol\Exceptions\UsageException;
 use Paracestamol\Module\ParacestamolHelper;
 
-class SettingsRun implements ICodeceptionHelperSettings
+class SettingsRun implements IStoreCodeceptionParams
 {
     // Arguments
     protected string    $suite;

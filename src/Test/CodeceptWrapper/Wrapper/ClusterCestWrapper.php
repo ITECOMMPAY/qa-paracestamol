@@ -23,6 +23,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
     protected RunnerFactory          $runnerFactory;
 
     protected string                 $cestName;
+    protected Set                    $actualGroups;
 
     protected CestWrapper            $cest;
     protected Queue                  $failedTests;
@@ -38,9 +39,10 @@ class ClusterCestWrapper implements ICodeceptWrapper
 
     public function __construct(Log $log, BombletWrapperFactory $wrapperFactory, RunnerFactory $runnerFactory, string $cestName, Set $actualGroups, ?Set $expectedGroups = null)
     {
-        $this->log = $log;
+        $this->log            = $log;
         $this->wrapperFactory = $wrapperFactory;
-        $this->runnerFactory = $runnerFactory;
+        $this->runnerFactory  = $runnerFactory;
+        $this->actualGroups   = $actualGroups;
 
         $this->cestName = $cestName;
 
@@ -185,7 +187,7 @@ class ClusterCestWrapper implements ICodeceptWrapper
         /** @var TestCaseRecord $testCaseRecord */
         foreach ($this->cest->getFailedTestRecords() as $testCaseRecord)
         {
-            $test = $this->wrapperFactory->getTestWrapper($this->cestName, $testCaseRecord->getName());
+            $test = $this->wrapperFactory->getTestWrapper($this->cestName, $testCaseRecord->getName(), $this->actualGroups);
             $this->failedTests->push($test);
         }
     }
@@ -263,6 +265,11 @@ class ClusterCestWrapper implements ICodeceptWrapper
     public function getMatch(TestNameParts $nameParts) : ?string
     {
         return $this->cest->getMatch($nameParts);
+    }
+
+    public function inGroups(Set $expectedGroups) : bool
+    {
+        return $this->cest->inGroups($expectedGroups);
     }
 
     public function getExpectedDuration() : ?int

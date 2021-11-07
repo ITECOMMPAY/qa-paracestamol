@@ -2,7 +2,7 @@
 
 namespace Paracestamol\Settings;
 
-class SettingsParse implements ICodeceptionHelperSettings
+class SettingsParse implements IStoreCodeceptionParams
 {
     // Arguments
     protected string    $suite;
